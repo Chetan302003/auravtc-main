@@ -60,7 +60,7 @@ const roleMap: Record<string, string> = {
       // 2. Create the Discord Embed Payload
       const payload = {
         username: "Aura VTC Contact Bot",
-        content: `New message for <@${selectedRoleId}>`,
+        content: `New message for <@&${selectedRoleId}>`,
         embeds: [
           {
             title: `📩 New Message: ${formData.subject}`,
@@ -246,7 +246,7 @@ const roleMap: Record<string, string> = {
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       required
-                      className="bclassName=" bg-secondary/50 border-border focus-visible:ring-primary focus:border-primary "
+                      className= "bg-secondary/50 border-border focus-visible:ring-primary focus:border-primary"
                     />
                   </div>
 
