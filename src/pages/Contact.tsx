@@ -229,7 +229,7 @@ const roleMap: Record<string, string> = {
                       <select 
                            value={formData.department}
                            onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                           className=className="flex h-10 w-full rounded-md border border-border bg-secondary/50 px-3 py-2 text-sm text-foreground transition-all duration-200 outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer appearance-none"
+                           className="flex h-10 w-full rounded-md border border-border bg-secondary/50 px-3 py-2 text-sm text-foreground transition-all duration-200 outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer appearance-none"
                       >
                                <option value="HR TEAM">HR Team (Recruitment/Staff)</option>
                                <option value="Event Team">Event Team (Convoys/Meetings)</option>
