@@ -36,6 +36,7 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    discordId: '',
     subject: '',
     message: '',
   });
@@ -160,6 +161,17 @@ const Contact = () => {
                       />
                     </div>
                   </div>
+                  <div className="space-y-2">
+                  <label className="text-sm font-medium">Discord ID (e.g., username#0000)</label>
+             <input
+               type="text"
+                    placeholder="username#1234"
+                    className="w-full bg-secondary/50 border-primary/20 p-2 rounded"
+                    value={formData.discordId}
+                     onChange={(e) => setFormData({ ...formData, discordId: e.target.value })}
+                      required
+                       />
+               </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground">Subject</label>
