@@ -53,7 +53,7 @@ const Footer = () => {
               {['Home', 'Our Team', 'Events', 'Apply'].map((link) => (
                 <li key={link}>
                   <Link
-                    {/*to={`/${link.toLowerCase().replace(' ', '-')}`}*/}
+                    
                      to={link === 'Home' ? '/' : `/${link.toLowerCase()}`}
                   
                     className="text-muted-foreground hover:text-primary transition-colors duration-300"
