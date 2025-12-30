@@ -48,8 +48,8 @@ const handleSubmit = async (e: React.FormEvent) => {
     setIsSubmitting(true);
 const roleMap: Record<string, string> = {
     "HR TEAM": "1431313604216356976", 
-    "Event Team": "1295398111061217350",
-    "Management": "1295331893692207165"
+    "Event Team": "1431313604384395446",
+    "Management": "1431313594083053669"
   };
 
   const selectedRoleId = roleMap[formData.department];
@@ -60,7 +60,7 @@ const roleMap: Record<string, string> = {
       // 2. Create the Discord Embed Payload
       const payload = {
         username: "Aura VTC Contact Bot",
-        content: `⚠️ New message for <@&${selectedRoleId}>`,
+        content: `New message for <@${selectedRoleId}>`,
         embeds: [
           {
             title: `📩 New Message: ${formData.subject}`,
@@ -211,39 +211,42 @@ const roleMap: Record<string, string> = {
                       />
                     </div>
                   </div>
+                  <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Discord ID </label>
-             <input
+             <Input
                type="text"
                     placeholder="username#1234"
-                    className="bg-secondary/50 border-border focus:border-primary"
                     value={formData.discordId}
                      onChange={(e) => setFormData({ ...formData, discordId: e.target.value })}
                       required
+                      className="bg-secondary/50 border-border focus:border-primary"
                        />
                </div>
                   
                   <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground"> Department </label>
-                      <select className="bg-secondary/50 border-border focus:border-primary"
+                      <select 
                            value={formData.department}
                            onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                           className="bg-secondary/50 border-border focus:border-primary"
                       >
                                <option value="HR TEAM">HR Team (Recruitment/Staff)</option>
                                <option value="Event Team">Event Team (Convoys/Meetings)</option>
                                <option value="Management">Management (General Inquiry)</option>
                       </select>
                  </div>
+                    </div>
 
                   
-                  <div className="space-y-2">
+                  <div className="space-y-2 h-10 flex-grow flex flex-col">
                     <label className="text-sm font-medium text-foreground">Subject</label>
                     <input
                       placeholder="What's this about?"
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       required
-                      className="bg-secondary/50 border-border focus:border-primary"
+                      className="bclassName=" bg-secondary/50 border-border focus-visible:ring-primary focus:border-primary "
                     />
                   </div>
 
