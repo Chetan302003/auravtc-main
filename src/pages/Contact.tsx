@@ -226,7 +226,7 @@ const roleMap: Record<string, string> = {
                   
                   <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground"> Department </label>
-                    <div className="relative group">
+                    
                       <select 
                            value={formData.department}
                            onChange={(e) => setFormData({ ...formData, department: e.target.value })}
@@ -235,12 +235,10 @@ const roleMap: Record<string, string> = {
                                <option value="HR TEAM">HR Team (Recruitment/Staff)</option>
                                <option value="Event Team">Event Team (Convoys/Meetings)</option>
                                <option value="Management">Management (General Inquiry)</option>
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary pointer-events-none transition-colors" />
-                      <div/>
+                      </select>                   
+                      
                  </div>
                     </div>
-
                   
                   <div className="space-y-2 h-10 flex-grow flex flex-col">
                     <label className="text-sm font-medium text-foreground">Subject</label>
