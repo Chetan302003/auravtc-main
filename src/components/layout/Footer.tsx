@@ -53,7 +53,9 @@ const Footer = () => {
               {['Home', 'Our Team', 'Events', 'Apply'].map((link) => (
                 <li key={link}>
                   <Link
-                    to={`/${link.toLowerCase().replace(' ', '-')}`}
+                    {/*to={`/${link.toLowerCase().replace(' ', '-')}`}*/}
+                     to={link === 'Home' ? '/' : `/${link.toLowerCase()}`}
+                  
                     className="text-muted-foreground hover:text-primary transition-colors duration-300"
                   >
                     {link}
@@ -65,6 +67,33 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
+  <h4 className="font-display font-semibold text-foreground mb-4">Resources</h4>
+  <ul className="space-y-2">
+    {['Server Status', 'Contact', 'TruckersMP'].map((link) => (
+      <li key={link}>
+        {link === 'TruckersMP' ? (
+          <a
+            href="https://truckersmp.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary transition-colors duration-300"
+          >
+            {link}
+          </a>
+        ) : (
+          <Link
+            /* FIX: Convert 'Server Status' to 'server-status' and 'Contact' to 'contact' */
+            to={`/${link.toLowerCase().replace(' ', '-')}`}
+            className="text-muted-foreground hover:text-primary transition-colors duration-300"
+          >
+            {link}
+          </Link>
+        )}
+      </li>
+    ))}
+  </ul>
+</div>
+          {/* <div>
             <h4 className="font-display font-semibold text-foreground mb-4">Resources</h4>
             <ul className="space-y-2">
               {['Server Status', 'Contact', 'TruckersMP'].map((link) => (
@@ -80,7 +109,7 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div>*/}
         </div>
 
         {/* Bottom Bar */}
