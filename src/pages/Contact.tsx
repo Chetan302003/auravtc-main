@@ -37,6 +37,7 @@ const Contact = () => {
     name: '',
     email: '',
     discordId: '',
+    department: '',
     subject: '',
     message: '',
   });
@@ -45,7 +46,13 @@ const Contact = () => {
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+const roleMap: Record<string, string> = {
+    "HR TEAM": "1431313604216356976", 
+    "Event Team": "1295398111061217350",
+    "Management": "1295331893692207165"
+  };
 
+  const selectedRoleId = roleMap[formData.department];
     try {
       // 1. REPLACE THIS URL with your actual Discord Webhook URL
      const DISCORD_WEBHOOK_URL = import.meta.env.VITE_DISCORD_WEBHOOK_URL;
@@ -53,6 +60,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       // 2. Create the Discord Embed Payload
       const payload = {
         username: "Aura VTC Contact Bot",
+        content: `⚠️ New message for <@&${selectedRoleId}>`,
         embeds: [
           {
             title: `📩 New Message: ${formData.subject}`,
@@ -61,6 +69,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               { name: "👤 Name", value: formData.name, inline: true },
               { name: "📧 Email", value: formData.email, inline: true },
               { name: "🎮 Discord ID", value: formData.discordId || "Not provided", inline: false },
+              { name: "🏢 Department", value: formData.department, inline: true },
               { name: "🏷️ Subject", value: formData.subject,  inline: true },
               { name: "📝 Message", value: formData.message },
             ],
@@ -85,7 +94,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       });
 
       // 4. Reset form (Including discordId)
-      setFormData({ name: '', email: '', discordId: '', subject: '', message: '' });
+      setFormData({ name: '', email: '', discordId: '', department: '', subject: '', message: '' });
 
     } catch (error) {
       toast({
@@ -207,16 +216,29 @@ const handleSubmit = async (e: React.FormEvent) => {
              <input
                type="text"
                     placeholder="username#1234"
-                    className="w-full bg-secondary/50 border-primary/20 p-2 rounded"
+                    className="bg-secondary/50 border-border focus:border-primary"
                     value={formData.discordId}
                      onChange={(e) => setFormData({ ...formData, discordId: e.target.value })}
                       required
                        />
                </div>
+                  
+                  <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground"> Department </label>
+                      <select className="bg-secondary/50 border-border focus:border-primary"
+                           value={formData.department}
+                           onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                      >
+                               <option value="HR TEAM">HR Team (Recruitment/Staff)</option>
+                               <option value="Event Team">Event Team (Convoys/Meetings)</option>
+                               <option value="Management">Management (General Inquiry)</option>
+                      </select>
+                 </div>
 
+                  
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground">Subject</label>
-                    <Input
+                    <input
                       placeholder="What's this about?"
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
