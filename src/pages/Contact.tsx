@@ -52,7 +52,7 @@ const roleMap: Record<string, string> = {
     "Management": "1431313594083053669"
   };
 
-  const selectedRoleId = roleMap[formData.department];
+  const selectedRoleId = roleMap[formData.department] || roleMap["Management"];
     try {
       // 1. REPLACE THIS URL with your actual Discord Webhook URL
      const DISCORD_WEBHOOK_URL = import.meta.env.VITE_DISCORD_WEBHOOK_URL;
