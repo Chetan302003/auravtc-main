@@ -37,7 +37,7 @@ const Contact = () => {
     name: '',
     email: '',
     discordId: '',
-    department: '',
+    department: 'Management',
     subject: '',
     message: '',
   });
@@ -229,7 +229,7 @@ const roleMap: Record<string, string> = {
                       <select 
                            value={formData.department}
                            onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                           className="bg-secondary/50 border-border focus:border-primary"
+                           className=className="flex h-10 w-full rounded-md border border-border bg-secondary/50 px-3 py-2 text-sm text-foreground transition-all duration-200 outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer appearance-none"
                       >
                                <option value="HR TEAM">HR Team (Recruitment/Staff)</option>
                                <option value="Event Team">Event Team (Convoys/Meetings)</option>
@@ -246,7 +246,7 @@ const roleMap: Record<string, string> = {
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       required
-                      className= "bg-secondary/50 border-border focus-visible:ring-primary focus:border-primary"
+                      className= "bg-secondary/50 border-border focus:border-primary focus-visible:ring-1 focus-visible:ring-primary"
                     />
                   </div>
 
