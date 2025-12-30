@@ -42,19 +42,60 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      // 1. REPLACE THIS URL with your actual Discord Webhook URL
+     const DISCORD_WEBHOOK_URL = import.meta.env.VITE_DISCORD_WEBHOOK_URL;
 
-    toast({
-      title: 'Message Sent!',
-      description: "We'll get back to you as soon as possible.",
-    });
+      // 2. Create the Discord Embed Payload
+      const payload = {
+        username: "Aura VTC Contact Bot",
+        embeds: [
+          {
+            title: `📩 New Message: ${formData.subject}`,
+            color: 5814783, // Aura VTC Blue/Purple color
+            fields: [
+              { name: "👤 Name", value: formData.name, inline: true },
+              { name: "📧 Email", value: formData.email, inline: true },
+              { name: "🎮 Discord ID", value: formData.discordId || "Not provided", inline: false },
+              { name: "🏷️ Subject", value: formData.subject,  inline: true },
+              { name: "📝 Message", value: formData.message },
+            ],
+            timestamp: new Date().toISOString(),
+            footer: { text: "Sent from Aura VTC Website" }
+          }
+        ]
+      };
 
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    setIsSubmitting(false);
+      // 3. Send the request
+      const response = await fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error('Failed to send to Discord');
+
+      toast({
+        title: 'Message Sent!',
+        description: "Your inquiry has been sent directly to our team on Discord.",
+      });
+
+      // 4. Reset form (Including discordId)
+      setFormData({ name: '', email: '', discordId: '', subject: '', message: '' });
+
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: "Something went wrong. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -162,7 +203,7 @@ const Contact = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                  <label className="text-sm font-medium">Discord ID (e.g., username#0000)</label>
+                  <label className="text-sm font-medium text-foreground">Discord ID </label>
              <input
                type="text"
                     placeholder="username#1234"
