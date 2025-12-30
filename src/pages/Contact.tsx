@@ -56,7 +56,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         embeds: [
           {
             title: `📩 New Message: ${formData.subject}`,
-            color: 6dd148, 
+            color: 3066993, 
             fields: [
               { name: "👤 Name", value: formData.name, inline: true },
               { name: "📧 Email", value: formData.email, inline: true },
