@@ -1,0 +1,20 @@
+project_id = "axianjkkkkboadfgiyqn"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[functions.truckersmp-events]
+verify_jwt = false
+
+[functions.truckersmp-members]
+verify_jwt = false
+
+[functions.truckersmp-partners]
+verify_jwt = false
+
+[functions.truckersmp-vtc]
+verify_jwt = false
