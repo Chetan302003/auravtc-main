@@ -234,8 +234,13 @@ const roleMap: Record<string, string> = {
   >
 {/* 1. THE TRIGGER (The box you see on the page) */}
 <SelectTrigger 
-  className="flex h-11 w-full rounded-md border border-primary/50 bg-white/5 backdrop-blur-md px-4 py-2 text-sm text-primary font-bold transition-all duration-300 outline-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0 focus:border-primary focus:shadow-[0_0_20px_rgba(46,204,113,0.3)] hover:border-primary hover:shadow-[0_0_15px_rgba(46,204,113,0.2)] cursor-pointer"
->
+className={`flex h-11 w-full rounded-md transition-all duration-300 outline-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0 focus:border-primary cursor-pointer
+        ${!formData.department 
+          ? "bg-secondary/50 border-border text-muted-foreground" 
+          : "bg-white/5 backdrop-blur-md border-primary text-primary font-bold shadow-[0_0_10px_rgba(46,204,113,0.2)]"
+        }`}
+  >
+  
   <SelectValue placeholder="Select Department" />
 </SelectTrigger>
 
