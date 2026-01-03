@@ -232,10 +232,12 @@ const roleMap: Record<string, string> = {
     onValueChange={(value) => setFormData({ ...formData, department: value })}
     value={formData.department}
   >
-    {/* 1. THE TRIGGER (The box you see on the page) */}
-    <SelectTrigger className="flex h-11 w-full rounded-md border border-primary bg-white/5 backdrop-blur-md px-4 py-2 text-sm text-primary font-bold transition-all duration-300 outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-[0_0_10px_rgba(46,204,113,0.2)]">
-      <SelectValue placeholder="Select Department" />
-    </SelectTrigger>
+{/* 1. THE TRIGGER (The box you see on the page) */}
+<SelectTrigger 
+  className="flex h-11 w-full rounded-md border border-primary/50 bg-white/5 backdrop-blur-md px-4 py-2 text-sm text-primary font-bold transition-all duration-300 outline-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0 focus:border-primary focus:shadow-[0_0_20px_rgba(46,204,113,0.3)] hover:border-primary hover:shadow-[0_0_15px_rgba(46,204,113,0.2)] cursor-pointer"
+>
+  <SelectValue placeholder="Select Department" />
+</SelectTrigger>
 
     {/* 2. THE CONTENT (The Apple-style Glass Dropdown) */}
     <SelectContent className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl">
