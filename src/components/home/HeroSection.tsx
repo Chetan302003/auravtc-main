@@ -22,7 +22,8 @@ const HeroSection = () => {
           {/* Content */}
           <div className="space-y-8 animate-slide-up">
             <div className="inline-block">
-              <span className="px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-sm tracking-widest">
+             {/*<span className="px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-sm tracking-widest">*/}
+              <span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-[10px] xs:text-xs md:text-sm tracking-widest inline-flex items-center text-center leading-none">
                 PROFESSIONAL VIRTUAL TRUCKING
               </span>
             </div>
