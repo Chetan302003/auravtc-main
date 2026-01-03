@@ -18,51 +18,46 @@ const StatsSection = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  const fetchVTCStats = async (isRefresh = false) => {
-    if (!isRefresh) setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('truckersmp-vtc');
-      
-      if (error) throw error;
-      
+const fetchVTCStats = async (isRefresh = false) => {
+  if (!isRefresh) setLoading(true);
+  try {
+    const { data, error } = await supabase.functions.invoke('truckersmp-vtc');
+    
+    // If the API works, we update the state with live data
+    if (!error && data?.vtc) {
       const vtc = data.vtc;
-      if (vtc) {
-        // 1. SAFELY EXTRACT MONTH AND YEAR
-        const createdDate = vtc.created_at ? new Date(vtc.created_at) : null;
-        let formattedDate = 'OCTOBER 2024'; // Your manual fallback
+      const createdDate = vtc.created_at ? new Date(vtc.created_at) : null;
+      let formattedDate = 'October 2024';
 
-        if (createdDate && !isNaN(createdDate.getTime())) {
-          const monthName = createdDate.toLocaleString('default', { month: 'long' });
-          const year = createdDate.getFullYear();
-          formattedDate = ` ${monthName} ${year}`;
-        }
-        
-        setStats({
-          // 2. KEEP LIVE MEMBER COUNT (Updates every 60s)
-          members: vtc.members_count || 0,
-          
-          // 3. MANUAL OVERRIDES (API doesn't provide these for free)
-          revenue: '€12.5B', 
-          distance: '986K km', 
-          
-          // 4. THE UPDATED DATE
-          joinedDate: formattedDate,
-        });
+      if (createdDate && !isNaN(createdDate.getTime())) {
+        formattedDate = createdDate.toLocaleString('default', { month: 'long', year: 'numeric' });
       }
-    } catch (err) {
-      console.error('Error fetching VTC stats:', err);
-      if (!isRefresh) {
-        setStats({
-          members: 0,
-          revenue: '-',
-          distance: '-',
-          joinedDate: '-',
-        });
-      }
-    } finally {
-      setLoading(false);
+      
+      setStats({
+        members: vtc.members_count || 12, // Live count
+        revenue: '€12.5B', // Manual
+        distance: '986K km', // Manual
+        joinedDate: formattedDate,
+      });
+    } else {
+      // If there is an error but we want to keep manual data visible:
+      throw new Error("API Offline");
     }
-  };
+  } catch (err) {
+    console.error('Error fetching VTC stats:', err);
+    // 2. FIX: Instead of setting everything to 0, set your Manual Defaults here
+    if (!isRefresh) {
+      setStats({
+        members: 14, // Put your current member count here as fallback
+        revenue: '€12.5B',
+        distance: '986K km',
+        joinedDate: 'OCTOBER 2024',
+      });
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchVTCStats();
