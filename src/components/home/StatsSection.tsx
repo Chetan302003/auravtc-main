@@ -34,7 +34,7 @@ const fetchVTCStats = async (isRefresh = false) => {
       }
       
       setStats({
-        members: vtc.members_count || 12, // Live count
+        members: vtc.members_count || 28, // Live count
         revenue: '€12.5B', // Manual
         distance: '986K km', // Manual
         joinedDate: formattedDate,
@@ -48,7 +48,7 @@ const fetchVTCStats = async (isRefresh = false) => {
     // 2. FIX: Instead of setting everything to 0, set your Manual Defaults here
     if (!isRefresh) {
       setStats({
-        members: 14, // Put your current member count here as fallback
+        members: 28, // Put your current member count here as fallback
         revenue: '€12.5B',
         distance: '986K km',
         joinedDate: 'OCTOBER 2024',
