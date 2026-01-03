@@ -39,7 +39,7 @@ const Contact = () => {
     name: '',
     email: '',
     discordId: '',
-    department: 'Management',
+    department: '',
     subject: '',
     message: '',
   });
@@ -261,7 +261,7 @@ const roleMap: Record<string, string> = {
       </SelectItem>
     </SelectContent>
   </Select>              
-                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary pointer-events-none transition-colors" />
+                      {/*<ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary pointer-events-none transition-colors" />*/}
                       </div>
                     </div>
                   </div>
