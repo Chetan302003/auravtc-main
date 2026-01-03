@@ -229,13 +229,13 @@ const roleMap: Record<string, string> = {
                       <select 
                            value={formData.department}
                            onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                           className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 backdrop-blur-xl px-6 py-2 text-sm text-muted-foreground transition-all duration-500 outline-none focus:border-primary focus:text-foreground focus:ring-2 focus:ring-primary/20 cursor-pointer appearance-none hover:border-primary hover:text-primary hover:shadow-[0_0_20px_rgba(46,204,113,0.2)]"
+                           className="flex h-10 w-full rounded-md border border-primary bg-white/5 backdrop-blur-md px-4 py-2 text-sm text-primary font-bold transition-all duration-300 outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer appearance-none shadow-[0_0_10px_rgba(46,204,113,0.2)]"
                       >
-                               <option value="HR TEAM" className="bg-[#0f1117] text-foreground hover:bg-primary/20">HR Team</option>
-                               <option value="Event Team" className="bg-[#0f1117] text-foreground hover:bg-primary/20">Event Team</option>
-                               <option value="Management" className="bg-[#0f1117] text-foreground hover:bg-primary/20">Management</option>
+                               <option value="HR TEAM" className="bg-[#0f1117] text-primary hover:bg-primary/20">HR Team</option>
+                               <option value="Event Team" className="bg-[#0f1117] text-primary hover:bg-primary/20">Event Team</option>
+                               <option value="Management" className="bg-[#0f1117] text-primary hover:bg-primary/20">Management</option>
                       </select>                   
-                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-primary group-focus-within:text-primary pointer-events-none transition-colors duration-300" />
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary pointer-events-none transition-colors" />
                       </div>
                     </div>
                   </div>
