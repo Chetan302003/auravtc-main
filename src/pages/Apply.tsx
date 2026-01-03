@@ -35,7 +35,7 @@ const Apply = () => {
     const HR_ROLE_ID = "1431313604216356976"; 
 
     try {
-      const DISCORD_WEBHOOK_URL = import.meta.env.VITE_DISCORD_WEBHOOK_URL;
+      const DISCORD_WEBHOOK_URL = import.meta.env.VITE_AURA_DISCORD_WEBHOOK;
 
       const payload = {
         username: "Aura VTC Recruitment Bot",
