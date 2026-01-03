@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { Select,SelectContent,SelectItem,SelectTrigger,SelectValue,} from "@/components/ui/select";
+
 
 const contactInfo = [
   {
@@ -226,15 +228,37 @@ const roleMap: Record<string, string> = {
                   <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground"> Department </label>
                     <div className="relative group">
-                      <select 
-                           value={formData.department}
-                           onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                           className="flex h-10 w-full rounded-md border border-primary bg-white/5 backdrop-blur-md px-4 py-2 text-sm text-primary font-bold transition-all duration-300 outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer appearance-none shadow-[0_0_10px_rgba(46,204,113,0.2)]"
-                      >
-                               <option value="HR TEAM" className="bg-[#0f1117] text-primary hover:bg-primary/20">HR Team</option>
-                               <option value="Event Team" className="bg-[#0f1117] text-primary hover:bg-primary/20">Event Team</option>
-                               <option value="Management" className="bg-[#0f1117] text-primary hover:bg-primary/20">Management</option>
-                      </select>                   
+<Select 
+    onValueChange={(value) => setFormData({ ...formData, department: value })}
+    value={formData.department}
+  >
+    {/* 1. THE TRIGGER (The box you see on the page) */}
+    <SelectTrigger className="flex h-11 w-full rounded-md border border-primary bg-white/5 backdrop-blur-md px-4 py-2 text-sm text-primary font-bold transition-all duration-300 outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-[0_0_10px_rgba(46,204,113,0.2)]">
+      <SelectValue placeholder="Select Department" />
+    </SelectTrigger>
+
+    {/* 2. THE CONTENT (The Apple-style Glass Dropdown) */}
+    <SelectContent className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl">
+      <SelectItem 
+        value="HR TEAM" 
+        className="text-foreground focus:bg-primary/20 focus:text-primary cursor-pointer transition-colors font-semibold py-3"
+      >
+        HR Team
+      </SelectItem>
+      <SelectItem 
+        value="Event Team" 
+        className="text-foreground focus:bg-primary/20 focus:text-primary cursor-pointer transition-colors font-semibold py-3"
+      >
+        Event Team
+      </SelectItem>
+      <SelectItem 
+        value="Management" 
+        className="text-foreground focus:bg-primary/20 focus:text-primary cursor-pointer transition-colors font-semibold py-3"
+      >
+        Management
+      </SelectItem>
+    </SelectContent>
+  </Select>              
                       <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary pointer-events-none transition-colors" />
                       </div>
                     </div>
