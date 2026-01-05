@@ -117,7 +117,7 @@ const Team = () => {
     <PageTransition>
     <Layout>
       <section className="py-16 sm:py-20 md:py-24 min-h-screen">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           {/* Header */}
           <div className="text-center mb-10 sm:mb-16 space-y-3 sm:space-y-4 animate-slide-up">
             <span className="px-3 sm:px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-xs sm:text-sm tracking-widest inline-block">
@@ -193,7 +193,7 @@ const Team = () => {
                                 <img 
                                   src={member.avatar} 
                                   alt={member.username}
-                                  className="w-20 h-20 rounded-full object-cover border-2 border-primary/30 group-hover:border-primary group-hover:glow-border transition-all duration-300"
+                                  className="w-14 h-14 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-primary/30 group-hover:border-primary group-hover:glow-border transition-all duration-300"
                                 />
                               ) : (
                                 <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
@@ -206,10 +206,10 @@ const Team = () => {
                                 </div>
                               )}
                             </div>
-                            <h3 className="font-display text-xl font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+                            <h3 className="w-full font-display text-sm sm:text-lg font-bold text-foreground mb-1 truncate group-hover:text-primary transition-colors">
                               {member.username}
                             </h3>
-                            <p className="text-primary font-medium text-sm mb-2">
+                            <p className="w-full text-primary font-medium text-[10px] sm:text-sm mb-2 truncate">
                               {member.role}
                             </p>
                             <p className="text-muted-foreground text-xs">
