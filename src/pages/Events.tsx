@@ -134,7 +134,7 @@ const fetchEvents = async (isRefresh = false) => {
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Event Banner */}
-                  <div className="relative aspect-video overflow-hidden bg-secondary/30">
+                  <div className="relative aspect-video md:aspect-auto overflow-hidden bg-secondary/30">
                     <img 
                       src={event.banner || 'https://truckersmp.com/assets/images/default_event_banner.jpg'} 
                       alt={event.name}
@@ -142,7 +142,7 @@ const fetchEvents = async (isRefresh = false) => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
                     <div className="absolute top-3 right-3">
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-primary/90 text-primary-foreground font-display">
+                      <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-tighter">
                         {event.game.toUpperCase()}
                       </span>
                     </div>
@@ -209,20 +209,21 @@ const fetchEvents = async (isRefresh = false) => {
 
           {/* Attending Events Grid */}
           {!loading && !error && attendingEvents.length > 0 && (
-            <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto"> 
               {attendingEvents.map((event, index) => (
                 <div
                   key={`attending-${event.id}`}
                   className="group glass-card rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500 hover:glow-border animate-slide-up flex flex-col hover:-translate-y-2"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
+                   {/* Attending Event Banner */}
                   <div className="relative aspect-video md:aspect-auto overflow-hidden bg-secondary/30">
                     <img 
                       src={event.banner || 'https://truckersmp.com/assets/images/default_event_banner.jpg'} 
                       alt={event.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
                     <div className="absolute top-3 right-3">
                       <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-tighter">
                         Attending
