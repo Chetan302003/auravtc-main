@@ -134,7 +134,7 @@ const fetchEvents = async (isRefresh = false) => {
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Event Banner */}
-                  <div className="relative aspect-video overflow-hidden">
+                  <div className="relative w-full md:w-2/5 aspect-video md:aspect-auto overflow-hidden bg-secondary/30">
                     <img 
                       src={event.banner || 'https://truckersmp.com/assets/images/default_event_banner.jpg'} 
                       alt={event.name}
@@ -209,14 +209,14 @@ const fetchEvents = async (isRefresh = false) => {
 
           {/* Attending Events Grid */}
           {!loading && !error && attendingEvents.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
               {attendingEvents.map((event, index) => (
                 <div
                   key={`attending-${event.id}`}
                   className="group glass-card rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500 hover:glow-border animate-slide-up flex flex-col hover:-translate-y-2"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="relative aspect-video overflow-hidden bg-secondary/30">
+                  <div className="relative w-full md:w-2/5 aspect-video md:aspect-auto overflow-hidden bg-secondary/30">
                     <img 
                       src={event.banner || 'https://truckersmp.com/assets/images/default_event_banner.jpg'} 
                       alt={event.name}
