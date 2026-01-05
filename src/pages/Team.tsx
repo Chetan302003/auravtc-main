@@ -172,7 +172,7 @@ const Team = () => {
                         : tierMembers.length === 2 
                           ? 'grid-cols-2 max-w-lg mx-auto'
                           : tierMembers.length === 3
-                            ? 'grid-cols-3 max-w-2xl mx-auto'
+                            ? 'grid-cols-1 max-w-[280px] mx-auto' 
                             : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
                     }`}>
                       {tierMembers.map((member, index) => {
@@ -185,7 +185,7 @@ const Team = () => {
                             href={`https://truckersmp.com/user/${member.user_id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`glass-card rounded-2xl p-6 text-center group hover:scale-105 hover:-translate-y-2 transition-all duration-500 ${tierStyles[tier]} hover:shadow-lg ${tierGlow[tier]} animate-scale-in`}
+                            className={`glass-card rounded-2xl p-4 sm:p-6 text-center group hover:scale-105 hover:-translate-y-2 transition-all duration-500 ${tierStyles[tier]} hover:shadow-lg ${tierGlow[tier]} animate-scale-in animate-scale-in h-full flex flex-col items-center`}
                             style={{ animationDelay: `${index * 0.08}s` }}
                           >
                             <div className="relative inline-block mb-4">
@@ -206,10 +206,10 @@ const Team = () => {
                                 </div>
                               )}
                             </div>
-                            <h3 className="w-full font-display text-sm sm:text-lg font-bold text-foreground mb-1 truncate group-hover:text-primary transition-colors">
+                            <h3 className="w-full font-display text-sm sm:text-lg font-bold text-foreground mb-1 break-words line-clamp-none leading-tight group-hover:text-primary transition-colors">
                               {member.username}
                             </h3>
-                            <p className="w-full text-primary font-medium text-[10px] sm:text-sm mb-2 truncate">
+                            <p className="w-full text-primary font-medium text-[10px] sm:text-sm mb-2 break-words leading-snug">
                               {member.role}
                             </p>
                             <p className="text-muted-foreground text-xs">
