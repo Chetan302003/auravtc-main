@@ -116,18 +116,18 @@ const Team = () => {
   return (
     <PageTransition>
     <Layout>
-      <section className="py-24 min-h-screen">
+      <section className="py-16 sm:py-20 md:py-24 min-h-screen">
         <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="text-center mb-16 space-y-4 animate-slide-up">
-            <span className="px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-sm tracking-widest inline-block">
+          <div className="text-center mb-10 sm:mb-16 space-y-3 sm:space-y-4 animate-slide-up">
+            <span className="px-3 sm:px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-xs sm:text-sm tracking-widest inline-block">
               MEET THE TEAM
             </span>
-            <h1 className="font-display text-5xl md:text-6xl font-bold">
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold">
               <span className="text-foreground">Our </span>
               <span className="text-primary glow-text">Team</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
               The dedicated individuals who make Aura VTC the best it can be
             </p>
             <div className="neon-line max-w-xs mx-auto" />
@@ -135,18 +135,18 @@ const Team = () => {
 
           {/* Loading State */}
           {loading && (
-            <div className="flex justify-center items-center py-20">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <span className="ml-3 text-muted-foreground">Loading team members...</span>
+            <div className="flex justify-center items-center py-16 sm:py-20">
+              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 text-primary animate-spin" />
+              <span className="ml-3 text-sm sm:text-base text-muted-foreground">Loading team members...</span>
             </div>
           )}
 
           {/* Error State */}
           {error && !loading && (
-            <div className="text-center py-20">
-              <Users className="w-16 h-16 text-destructive mx-auto mb-4" />
-              <h3 className="font-display text-2xl font-bold mb-2">Error Loading Team</h3>
-              <p className="text-muted-foreground">{error}</p>
+             <div className="text-center py-16 sm:py-20">
+              <Users className="w-12 h-12 sm:w-16 sm:h-16 text-destructive mx-auto mb-4" />
+              <h3 className="font-display text-xl sm:text-2xl font-bold mb-2">Error Loading Team</h3>
+              <p className="text-sm sm:text-base text-muted-foreground">{error}</p>
             </div>
           )}
 
@@ -162,11 +162,11 @@ const Team = () => {
                 if (tierMembers.length === 0) return null;
 
                 return (
-                  <div key={tierKey} className="mb-12 animate-slide-up" style={{ animationDelay: `${0.1 * (['founder', 'management', 'hr', 'member', 'trainee'] as RoleTier[]).indexOf(tierKey)}s` }}>
-                    <h2 className="font-display text-2xl font-bold text-center mb-6">
+                  <div key={tierKey} className="mb-8 sm:mb-12 animate-slide-up" style={{ animationDelay: `${0.1 * (['founder', 'management', 'hr', 'member', 'trainee'] as RoleTier[]).indexOf(tierKey)}s` }}>
+                    <h2 className="font-display text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6">
                       <span className="text-primary animate-pulse-glow">{tierLabels[tierKey]}</span>
                     </h2>
-                    <div className={`grid gap-6 ${
+                    <div className={`grid gap-4 sm:gap-6 ${
                       tierMembers.length === 1 
                         ? 'grid-cols-1 max-w-xs mx-auto' 
                         : tierMembers.length === 2 
