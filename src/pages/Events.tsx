@@ -34,15 +34,23 @@ const Events = () => {
   const [events, setEvents] = useState<TruckersMPEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attendingEvents, setAttendingEvents] = useState<TruckersMPEvent[]>([]);
 
-  const fetchEvents = async (isRefresh = false) => {
+const fetchEvents = async (isRefresh = false) => {
     if (!isRefresh) setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('truckersmp-events');
+      // Fetch both hosted and attending events simultaneously
+      const [hostedResponse, attendingResponse] = await Promise.all([
+        supabase.functions.invoke('truckersmp-events'),
+        supabase.functions.invoke('truckersmp-events-attending')
+      ]);
       
-      if (error) throw error;
+      if (hostedResponse.error) throw hostedResponse.error;
+      if (attendingResponse.error) throw attendingResponse.error;
       
-      setEvents(data.events || []);
+      setEvents(hostedResponse.data.events || []);
+      // Limit to 6 attending events 
+      setAttendingEvents((attendingResponse.data.events || []).slice(0, 6));
       setError(null);
     } catch (err) {
       console.error('Error fetching events:', err);
@@ -106,7 +114,7 @@ const Events = () => {
               <span className="ml-3 text-muted-foreground">Loading events...</span>
             </div>
           )}
-
+          
           {/* Error State */}
           {error && !loading && (
             <div className="text-center py-20">
@@ -181,6 +189,74 @@ const Events = () => {
                         <ExternalLink className="w-4 h-4" />
                       </Button>
                     </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Section Divider */}
+          {!loading && !error && attendingEvents.length > 0 && (
+            <div className="mt-32 mb-16 space-y-4 text-center animate-slide-up">
+              <span className="px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-sm tracking-widest inline-block uppercase">
+                VTC Participation
+              </span>
+              <h2 className="font-display text-4xl md:text-5xl font-bold">
+                Events We're <span className="text-primary glow-text">Attending</span>
+              </h2>
+              <div className="neon-line max-w-xs mx-auto" />
+            </div>
+          )}
+
+          {/* Attending Events Grid */}
+          {!loading && !error && attendingEvents.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+              {attendingEvents.map((event, index) => (
+                <div
+                  key={`attending-${event.id}`}
+                  className="group glass-card rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500 hover:glow-border animate-slide-up flex flex-col hover:-translate-y-2"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className="relative aspect-video overflow-hidden bg-secondary/30">
+                    <img 
+                      src={event.banner || 'https://truckersmp.com/assets/images/default_event_banner.jpg'} 
+                      alt={event.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                    <div className="absolute top-3 right-3">
+                      <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-tighter">
+                        Attending
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="p-5 flex flex-col flex-1 space-y-4">
+                    <h3 className="font-display text-lg font-bold text-foreground line-clamp-2 min-h-[3rem] group-hover:text-primary transition-colors">
+                      {event.name}
+                    </h3>
+
+                    <div className="space-y-2 text-[13px]">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="w-4 h-4 text-primary shrink-0" />
+                        <span className="truncate">{formatDate(event.start_at)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Clock className="w-4 h-4 text-primary shrink-0" />
+                        <span>{formatTime(event.start_at)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <MapPin className="w-4 h-4 text-primary shrink-0" />
+                        <span className="truncate">{event.departure.city} → {event.arrive.city}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4 mt-auto">
+                      <a href={`https://truckersmp.com/events/${event.slug}`} target="_blank" rel="noopener noreferrer">
+                        <Button variant="glow" className="w-full text-xs font-bold uppercase tracking-widest">
+                          Event Link <ExternalLink className="w-4 h-4 ml-2" />
+                        </Button>
+                      </a>
+                    </div>
                   </div>
                 </div>
               ))}
