@@ -117,7 +117,7 @@ const Team = () => {
     <PageTransition>
     <Layout>
       <section className="py-16 sm:py-20 md:py-24 min-h-screen">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="container mx-auto px-4 max-w-7xl sm:px-6 lg:px-8 ">
           {/* Header */}
           <div className="text-center mb-10 sm:mb-16 space-y-3 sm:space-y-4 animate-slide-up">
             <span className="px-3 sm:px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-xs sm:text-sm tracking-widest inline-block">
@@ -172,7 +172,7 @@ const Team = () => {
                         : tierMembers.length === 2 
                           ? 'grid-cols-2 max-w-lg mx-auto'
                           : tierMembers.length === 3
-                            ? 'grid-cols-1 max-w-[280px] mx-auto' 
+                            ? 'grid-cols-1 sm:grid-cols-3 max-w-4xl mx-auto' 
                             : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
                     }`}>
                       {tierMembers.map((member, index) => {
