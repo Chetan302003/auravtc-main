@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Users, Calendar, FileText, Server, Mail } from 'lucide-react';
+import { Menu, X, Home, Users, Calendar, FileText, Server, Mail, Shield, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/logo.png';
 
@@ -9,6 +9,7 @@ const navItems = [
   { path: '/team', label: 'Our Team', icon: Users },
   { path: '/events', label: 'Events', icon: Calendar },
   { path: '/apply', label: 'Apply', icon: FileText },
+  { path: '/gallery', label: 'Gallery', icon: Image },
   { path: '/server-status', label: 'Server Status', icon: Server },
   { path: '/contact', label: 'Contact', icon: Mail },
 ];
@@ -17,6 +18,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const { user, isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,6 +80,43 @@ const Navbar = () => {
                 </Link>
               );
             })}
+          </div>
+          
+      {/* Admin/Login Link */}
+            {user ? (
+              <Link to="/admin">
+                <Button
+                  variant="nav"
+                  className={`relative ${
+                    location.pathname === '/admin' ? 'text-primary' : ''
+                  }`}
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin
+                  {isAdmin && (
+                    <span className="ml-1 w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  )}
+                  {location.pathname === '/admin' && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
+                  )}
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button
+                  variant="nav"
+                  className={`relative ${
+                    location.pathname === '/auth' ? 'text-primary' : ''
+                  }`}
+                >
+                  <Shield className="w-4 h-4" />
+                  Login
+                  {location.pathname === '/auth' && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
+                  )}
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
