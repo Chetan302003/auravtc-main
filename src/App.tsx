@@ -15,7 +15,6 @@ import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import EventBooking from "./pages/EventBooking";
 import Gallery from "./pages/Gallery";
-import NotFound from "./pages/NotFound"
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -30,6 +29,7 @@ const AnimatedRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/team" element={<Team />} />
         <Route path="/events" element={<Events />} />
+        <Route path="/events/:eventId/book" element={<EventBooking />} />
         <Route path="/apply" element={<Apply />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/server-status" element={<ServerStatus />} />
