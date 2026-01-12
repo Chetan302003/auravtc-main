@@ -131,8 +131,8 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       <div
-        className={`lg:hidden absolute top-full left-0 right-0 bg-background/98 backdrop-blur-xl border-b border-border/50 transition-all duration-300 ${
-          isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+          className={`lg:hidden absolute top-full left-0 right-0 bg-background/98 backdrop-blur-xl border-b border-border/50 transition-all duration-300 ${
+          isOpen ?'opacity-100 visible' : 'opacity-0 invisible'
         }`}
       >
         <div className="container mx-auto px-4 py-4 space-y-2">
