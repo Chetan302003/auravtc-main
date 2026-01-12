@@ -11,6 +11,11 @@ import Team from "./pages/Team";
 import Events from "./pages/Events";
 import Apply from "./pages/Apply";
 import ServerStatus from "./pages/ServerStatus";
+import Auth from "./pages/Auth";
+import Admin from "./pages/Admin";
+import EventBooking from "./pages/EventBooking";
+import Gallery from "./pages/Gallery";
+import NotFound from "./pages/NotFound"
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -26,8 +31,11 @@ const AnimatedRoutes = () => {
         <Route path="/team" element={<Team />} />
         <Route path="/events" element={<Events />} />
         <Route path="/apply" element={<Apply />} />
+        <Route path="/gallery" element={<Gallery />} />
         <Route path="/server-status" element={<ServerStatus />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
