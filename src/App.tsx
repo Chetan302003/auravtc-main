@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
 import { AnimatePresence } from "framer-motion";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
@@ -44,6 +45,7 @@ const AnimatedRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+  <AuthProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -53,6 +55,7 @@ const App = () => (
       <SpeedInsights />
       <Analytics />
     </TooltipProvider>
+  </AuthProvider>
   </QueryClientProvider>
 );
 
