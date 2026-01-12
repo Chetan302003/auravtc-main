@@ -154,10 +154,40 @@ const Navbar = () => {
               </Link>
             );
           })}
+
+            {/* Admin/Login Link for Mobile */}
+          {user ? (
+            <Link
+              to="/admin"
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
+                location.pathname === '/admin'
+                  ? 'bg-primary/10 text-primary border border-primary/30'
+                  : 'hover:bg-secondary text-foreground'
+              }`}
+            >
+              <Shield className="w-5 h-5" />
+              <span className="font-medium">Admin</span>
+              {isAdmin && (
+                <span className="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse" />
+              )}
+            </Link>
+          ) : (
+            <Link
+              to="/auth"
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
+                location.pathname === '/auth'
+                  ? 'bg-primary/10 text-primary border border-primary/30'
+                  : 'hover:bg-secondary text-foreground'
+              }`}
+            >
+              <Shield className="w-5 h-5" />
+              <span className="font-medium">Login</span>
+            </Link>
+          )}
         </div>
       </div>
     </nav>
   );
-};
-
+};        
+;
 export default Navbar;
