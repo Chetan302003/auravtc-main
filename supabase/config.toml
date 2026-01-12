@@ -10,6 +10,9 @@ max_rows = 1000
 [functions.truckersmp-events]
 verify_jwt = false
 
+[functions.truckersmp-vtc-events]
+verify_jwt = false
+
 [functions.truckersmp-members]
 verify_jwt = false
 
@@ -17,4 +20,22 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.truckersmp-vtc]
+verify_jwt = false
+
+[functions.sync-vtc-members]
+verify_jwt = false
+
+[functions.check-attendance]
+verify_jwt = false
+
+[functions.discord-booking-webhook]
+verify_jwt = false
+
+[functions.discord-booking-callback]
+verify_jwt = false
+
+[functions.discord-bot-interaction]
+verify_jwt = false
+
+[functions.send-booking-email]
 verify_jwt = false
