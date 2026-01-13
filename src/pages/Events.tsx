@@ -1,4 +1,5 @@
-import { Calendar, MapPin, Clock, Users, ExternalLink, Loader2 } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, ExternalLink, Loader2, Truck, Ticket } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import PageTransition from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/button';
@@ -177,7 +178,13 @@ const fetchEvents = async (isRefresh = false) => {
                     </div>
                   </div>
                   
-                  <div className="px-6 pb-6 pt-0">
+                  <div className="px-6 pb-6 pt-0 space-y-2">
+                    <Link to={`/events/${event.id}/book`} className="w-full block">
+                     <Button variant="glow" className="w-full text-sm">
+                      <Ticket className="w-4 h-4 mr-2" />
+                        Book Slot
+                       </Button>
+                      </Link>
                     <a
                       href={`https://truckersmp.com/events/${event.slug}`}
                       target="_blank"
