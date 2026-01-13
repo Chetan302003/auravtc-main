@@ -148,19 +148,20 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
       
       if (data?.events) {
         // Fetch booking enabled states from database
-        const eventIds = data.events.map((e: Event) => e.id.toString());
+         const apiEvents = data.events;
+         const truckersMPIds = apiEvents.map((e: Event) => e.id);
         const { data: dbEvents } = await supabase
           .from('events')
-          .select('id, slot_booking_enabled')
-          .in('id', eventIds);
+          .select('tmp_event_id, slot_booking_enabled')
+          .in('tmp_event_id', truckersMPIds);
         
         const toggleStates: Record<number, boolean> = {};
         dbEvents?.forEach(e => {
-          toggleStates[parseInt(e.id as unknown as string)] = e.slot_booking_enabled ?? true;
+          if (e.tmp_event_id) {
+          toggleStates[Number(e.tmp_event_id)] = e.slot_booking_enabled ?? true;
         });
         setBookingToggleStates(toggleStates);
-        
-        setEvents(data.events.slice(0, 10));
+        setEvents(apiEvents.slice(0, 10));
       }
     } catch (error) {
       console.error('Error fetching events:', error);
