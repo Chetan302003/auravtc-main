@@ -206,8 +206,9 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
     setLoading(false);
   };
 
-  const handleToggleBookingSystem = async (eventId: number, enabled: boolean) => {
+  const handleToggleBookingSystem = async (truckersMPId: number, eventId: number, enabled: boolean) => {
     setActionLoading(`toggle-${eventId}`);
+    setActionLoading(`toggle-${truckersMPId}`);
     try {
       const event = events.find(e => e.id === eventId);
       const { error } = await supabase
