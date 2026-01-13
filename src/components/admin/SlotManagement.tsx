@@ -206,7 +206,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
     setLoading(false);
   };
 
-  const handleToggleBookingSystem = async (truckersMPId: number, eventId: number, enabled: boolean) => {
+  const handleToggleBookingSystem = async (truckersMPId: number, eventId: number, isEnabled: boolean) => {
     setActionLoading(`toggle-${eventId}`);
     setActionLoading(`toggle-${truckersMPId}`);
     try {
