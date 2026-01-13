@@ -22,7 +22,7 @@ const fetchVTCStats = async (isRefresh = false) => {
   if (!isRefresh) setLoading(true);
   try {
     const { data, error } = await supabase.functions.invoke('truckersmp-vtc');
-    
+    method: 'GET', // Explicitly set method
     // If the API works, we update the state with live data
     if (!error && data?.vtc) {
       const vtc = data.vtc;
@@ -63,7 +63,7 @@ const fetchVTCStats = async (isRefresh = false) => {
     fetchVTCStats();
     
     // Auto-refresh every 60 seconds
-    const interval = setInterval(() => fetchVTCStats(true), 60000);
+    const interval = setInterval(() => fetchVTCStats(true), 600000);
     return () => clearInterval(interval);
   }, []);
 
