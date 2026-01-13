@@ -207,19 +207,19 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
   };
 
   const handleToggleBookingSystem = async (truckersMPId: number, eventId: number, isEnabled: boolean) => {
-    setActionLoading(`toggle-${eventId}`);
+    
     setActionLoading(`toggle-${truckersMPId}`);
     try {
-      const event = events.find(e => e.id === eventId);
+      const event = events.find(e => e.id === truckersMPId );
       const { error } = await supabase
         .from('events')
         .upsert({
-          id: eventId.toString(),
+          
         tmp_event_id: truckersMPId,      
         slot_booking_enabled: isEnabled,
           title: events.find(e => e.id === truckersMPId)?.name || 'Event',
           start_time: event?.start_at || new Date().toISOString(),
-        }, { onConflict: 'id , tmp_event_id' });
+        }, { onConflict: 'tmp_event_id' });
 
       if (error) throw error;
 
