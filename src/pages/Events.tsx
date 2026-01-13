@@ -178,15 +178,6 @@ const fetchEvents = async (isRefresh = false) => {
                   </div>
                   
                   <div className="px-6 pb-6 pt-0">
-                  {/* Book Slot Button - Only for VTC Events */}
-                  {isVtcEvent && (
-                  <Link to={`/events/${event.id}/book`} className="w-full block">
-                  <Button variant="glow" className="w-full text-sm">
-                  <Ticket className="w-3 h-3 sm:w-4 sm:h-4" />
-                   Book Slot
-                  </Button>
-                  </Link>
-                  )}
                     <a
                       href={`https://truckersmp.com/events/${event.slug}`}
                       target="_blank"
