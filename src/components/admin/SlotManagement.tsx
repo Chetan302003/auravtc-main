@@ -222,7 +222,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
 
       if (error) throw error;
 
-      setBookingToggleStates(prev => ({ ...prev, [eventId]: enabled }));
+      setBookingToggleStates(prev => ({ ...prev, [eventId]: enabled, [truckersMPId]: isEnabled }));
       toast.success(`Slot booking ${enabled ? 'enabled' : 'disabled'} for this event`);
     } catch (error: any) {
       console.error("Database Error:", error.message);
