@@ -214,16 +214,18 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
         .from('events')
         .upsert({
           id: eventId.toString(),
-          slot_booking_enabled: enabled,
-          title: event?.name || 'Event',
+        tmp_event_id: truckersMPId,      
+        slot_booking_enabled: isEnabled,
+          title: events.find(e => e.id === truckersMPId)?.name || 'Event',
           start_time: event?.start_at || new Date().toISOString(),
-        }, { onConflict: 'id' });
+        }, { onConflict: 'id','tmp_event_id' });
 
       if (error) throw error;
 
       setBookingToggleStates(prev => ({ ...prev, [eventId]: enabled }));
       toast.success(`Slot booking ${enabled ? 'enabled' : 'disabled'} for this event`);
     } catch (error: any) {
+      console.error("Database Error:", error.message);
       toast.error(error.message || 'Failed to update booking status');
     } finally {
       setActionLoading(null);
