@@ -219,13 +219,13 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
           
         tmp_event_id: truckersMPId,      
         slot_booking_enabled: isEnabled,
-          title: events.find(e => e.id === truckersMPId)?.name || 'Event',
+          title: event?.name || 'Event',
           start_time: event?.start_at || new Date().toISOString(),
         }, { onConflict: 'tmp_event_id' });
 
       if (error) throw error;
 
-      setBookingToggleStates(prev => ({ ...prev, [eventId]: enabled, [truckersMPId]: isEnabled }));
+      setBookingToggleStates(prev => ({ ...prev, [truckersMPId]: isEnabled, [eventId]: isEnabled }));
       toast.success(`Slot booking ${enabled ? 'enabled' : 'disabled'} for this event`);
     } catch (error: any) {
       console.error("Database Error:", error.message);
