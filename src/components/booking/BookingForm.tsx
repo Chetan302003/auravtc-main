@@ -23,7 +23,6 @@ const bookingSchema = z.object({
     .max(50, 'Contact name must be at most 50 characters'),
   contact_email: z.string()
     .email('Please enter a valid email address')
-    .optional()
     .or(z.literal('')),
   member_count: z.coerce.number()
     .min(4, 'Minimum 4 members required')
@@ -67,7 +66,7 @@ const BookingForm = ({ eventId, slotNumber, onSuccess, onCancel }: BookingFormPr
           discord_id: data.discord_id,
           vtc_name: data.vtc_name,
           contact_name: data.contact_name,
-          contact_email: data.contact_email || null,
+          contact_email: data.contact_email,
           member_count: data.member_count,
           notes: data.notes || null,
           status: 'pending',
@@ -85,6 +84,7 @@ const BookingForm = ({ eventId, slotNumber, onSuccess, onCancel }: BookingFormPr
           slot_number: slotNumber,
           vtc_name: data.vtc_name,
           discord_id: data.discord_id,
+          contact_email: data.contact_email,
           contact_name: data.contact_name,
           member_count: data.member_count,
           notes: data.notes,
@@ -150,7 +150,7 @@ const BookingForm = ({ eventId, slotNumber, onSuccess, onCancel }: BookingFormPr
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="contact_email">Contact Email (Optional)</Label>
+        <Label htmlFor="contact_email">Contact Email </Label>
         <Input
           id="contact_email"
           type="email"
