@@ -218,7 +218,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
         slot_booking_enabled: isEnabled,
           title: events.find(e => e.id === truckersMPId)?.name || 'Event',
           start_time: event?.start_at || new Date().toISOString(),
-        }, { onConflict: 'id','tmp_event_id' });
+        }, { onConflict: 'id , tmp_event_id' });
 
       if (error) throw error;
 
