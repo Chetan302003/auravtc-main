@@ -159,6 +159,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
         dbEvents?.forEach(e => {
           if (e.tmp_event_id) {
           toggleStates[Number(e.tmp_event_id)] = e.slot_booking_enabled ?? true;
+          }
         });
         setBookingToggleStates(toggleStates);
         setEvents(apiEvents.slice(0, 10));
