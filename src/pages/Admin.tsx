@@ -25,6 +25,7 @@ import AttendanceDownload from '@/components/admin/AttendanceDownload';
 import SystemLogs from '@/components/admin/SystemLogs';
 import SlotManagement from '@/components/admin/SlotManagement';
 import GalleryManagement from '@/components/admin/GalleryManagement';
+import VTCSettingsManagement from '@/components/admin/VTCSettingsManagement';
 
 interface Member {
   id: string;
@@ -573,6 +574,16 @@ const Admin = () => {
               </motion.div>
             </div>
           </div>
+          
+          {/* VTC Settings Management - Full Width */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.72 }}
+            className="mt-6"
+          >
+            <VTCSettingsManagement isAdmin={isAdmin} />
+          </motion.div>
 
           {/* Slot Management - Full Width */}
           <motion.div
