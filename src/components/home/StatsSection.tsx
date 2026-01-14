@@ -1,124 +1,127 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Users, Truck, Route, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface VTCStats {
-  members: number;
+  members: string;
   revenue: string;
   distance: string;
   joinedDate: string;
 }
 
 const StatsSection = () => {
-  // 1. Better Initial State: Use your manual defaults as the starting point
   const [stats, setStats] = useState<VTCStats>({
-    members: 28, 
-    revenue: '€12.5B',
-    distance: '986K km',
-    joinedDate: 'October 2024',
+    members: '0',
+    revenue: '€0',
+    distance: '0 km',
+    joinedDate: '-',
   });
   const [loading, setLoading] = useState(true);
 
-  const fetchVTCStats = useCallback(async (isRefresh = false) => {
-    if (!isRefresh) setLoading(true);
-    
+  const fetchVTCStats = async () => {
+    setLoading(true);
     try {
-      // Calling the Edge Function we just fixed
-      const { data, error } = await supabase.functions.invoke('truckersmp-vtc', {
-        method: 'GET', // Explicitly set method
-      });
+      const { data, error } = await supabase
+        .from('vtc_settings')
+        .select('setting_key, setting_value');
       
       if (error) throw error;
-
-      if (data?.vtc) {
-        const vtc = data.vtc;
+      
+      if (data && data.length > 0) {
+        const settingsMap: Record<string, string> = {};
+        data.forEach(item => {
+          settingsMap[item.setting_key] = item.setting_value;
+        });
         
-        // Format the founded date from the API
-        const createdDate = vtc.created_at ? new Date(vtc.created_at) : null;
-        let formattedDate = 'October 2024';
-
-        if (createdDate && !isNaN(createdDate.getTime())) {
-          formattedDate = createdDate.toLocaleString('default', { 
-            month: 'long', 
-            year: 'numeric' 
-          });
-        }
-        
-        setStats(prev => ({
-          ...prev,
-          members: vtc.members_count || prev.members,
-          joinedDate: formattedDate,
-          // Revenue and Distance remain manual as TMP API doesn't provide these directly
-        }));
+        setStats({
+          members: settingsMap['members_count'] || '0',
+          revenue: settingsMap['total_revenue'] || '€0',
+          distance: settingsMap['distance_covered'] || '0 km',
+          joinedDate: settingsMap['founded_date'] || '-',
+        });
       }
     } catch (err) {
-      console.error('Stats fetch failed, using fallback:', err);
-      // We don't need to do anything here because our 'stats' state 
-      // already contains the manual defaults.
+      console.error('Error fetching VTC stats:', err);
+      setStats({
+        members: '-',
+        revenue: '-',
+        distance: '-',
+        joinedDate: '-',
+      });
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchVTCStats();
-    const interval = setInterval(() => fetchVTCStats(true), 60000);
-    return () => clearInterval(interval);
-  }, [fetchVTCStats]);
+  }, []);
 
   const statItems = [
-    { icon: Users, value: stats.members.toString(), label: 'Active Members' },
-    { icon: Truck, value: stats.revenue, label: 'Total Revenue' },
-    { icon: Route, value: stats.distance, label: 'Distance Covered' },
-    { icon: Calendar, value: stats.joinedDate, label: 'Founded' },
+    { icon: Users, value: stats.members, label: 'Active Members', suffix: '' },
+    { icon: Truck, value: stats.revenue, label: 'Total Revenue', suffix: '' },
+    { icon: Route, value: stats.distance, label: 'Distance Covered', suffix: '' },
+    { icon: Calendar, value: stats.joinedDate, label: 'Founded', suffix: '' },
   ];
 
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-12 sm:py-16 md:py-20 relative overflow-hidden">
+      {/* Background accent */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+      
+      {/* Animated background particles - hidden on mobile */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 rounded-full bg-primary/30 animate-float"
+            style={{
+              left: `${20 + i * 15}%`,
+              top: `${30 + (i % 3) * 20}%`,
+              animationDelay: `${i * 0.5}s`,
+            }}
+          />
+        ))}
+      </div>
+      
       <div className="container mx-auto px-4 relative">
-        <div className="glass-card rounded-3xl p-8 md:p-12 animate-slide-up hover:glow-border transition-all duration-500">
-          
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-              <span className="text-foreground">Live </span>
-              <span className="text-primary glow-text">Statistics</span>
+        <div className="glass-card rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 animate-slide-up hover:glow-border transition-all duration-500">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 animate-fade-in">
+              <span className="text-foreground">Our </span>
+              <span className="text-primary glow-text animate-pulse-glow">Statistics</span>
             </h2>
-            <p className="text-muted-foreground italic">
-              Real-time data synchronization active
+            <p className="text-sm sm:text-base text-muted-foreground animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              Aura VTC achievements
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {statItems.map((item, index) => {
               const Icon = item.icon;
               return (
                 <div
                   key={item.label}
-                  className="text-center p-6 rounded-2xl bg-secondary/50 border border-border/30 hover:border-primary/50 transition-all duration-500 group"
+                  className="text-center p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-secondary/50 border border-border/30 hover:border-primary/50 transition-all duration-500 group hover:-translate-y-2 hover:glow-border animate-scale-in"
+                  style={{ animationDelay: `${0.1 + index * 0.1}s` }}
                 >
-                  <div className="inline-flex p-3 rounded-xl bg-primary/10 text-primary mb-4 group-hover:scale-110 transition-transform">
-                    <Icon className="w-6 h-6" />
+                  <div className="inline-flex p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10 text-primary mb-3 sm:mb-4 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300">
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  
-                  <div className="font-display text-2xl md:text-3xl font-bold text-primary glow-text mb-2">
-                    {/* Only show skeleton during the INITIAL load, not on refreshes */}
-                    {loading && stats.members === 0 ? (
-                      <div className="h-8 w-16 mx-auto bg-muted animate-pulse rounded" />
+                  <div className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary glow-text mb-1 sm:mb-2 group-hover:animate-pulse-glow break-all">
+                    {loading ? (
+                      <div className="h-8 sm:h-10 w-16 sm:w-20 mx-auto bg-muted animate-pulse rounded" />
                     ) : (
-                      item.value
+                      <>
+                        {item.value}
+                        {item.suffix}
+                      </>
                     )}
                   </div>
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                    {item.label}
-                  </div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">{item.label}</div>
                 </div>
               );
             })}
-          </div>
-
-          <div className="flex justify-center items-center gap-2 mt-8 text-[10px] text-muted-foreground/60">
-             <div className={`w-1.5 h-1.5 rounded-full ${loading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'}`} />
-             {loading ? 'SYNCING WITH TRUCKERSMP...' : 'DATA VERIFIED BY TMP API'}
           </div>
         </div>
       </div>
