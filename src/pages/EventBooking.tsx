@@ -29,6 +29,7 @@ interface Slot {
   slot_label: string | null;
   is_locked: boolean;
   locked_for: string | null;
+  slot_image_url?: string | null;
   status: 'available' | 'pending' | 'booked';
   booking?: {
     vtc_name: string;
@@ -90,6 +91,7 @@ const EventBooking = () => {
             slot_label: slot.slot_label,
             is_locked: slot.is_locked,
             locked_for: slot.locked_for,
+            slot_image_url: slot.slot_image_url,
             status: slot.is_locked ? 'booked' as const : 
                    booking ? (booking.status === 'approved' ? 'booked' as const : 'pending' as const) : 
                    'available' as const,
@@ -298,6 +300,7 @@ const EventBooking = () => {
                     slots={slots} 
                     onSlotSelect={handleSlotSelect}
                     selectedSlot={selectedSlot}
+                    eventBanner={event.banner}
                   />
                 </div>
               </div>
