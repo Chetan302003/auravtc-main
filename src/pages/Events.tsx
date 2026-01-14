@@ -178,7 +178,7 @@ const fetchEvents = async (isRefresh = false) => {
                     </div>
                   </div>
                   
-                  <div className="px-6 pb-6 pt-0 space-y-4">
+                  <div className="px-6 pb-6 pt-0 mb-3 space-y-2">
                     <Link to={`/events/${event.id}/book`} className="w-full block">
                      <Button variant="glow" className="w-full text-sm">
                       <Ticket className="w-4 h-4 mr-2" />
