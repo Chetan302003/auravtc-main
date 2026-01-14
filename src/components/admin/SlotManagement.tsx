@@ -147,22 +147,20 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
       if (error) throw error;
       
       if (data?.events) {
-        // Fetch booking enabled states from database
-         const apiEvents = data.events;
-         const truckersMPIds = apiEvents.map((e: Event) => e.id);
-        const { data: dbEvents } = await supabase
-          .from('events')
-          .select('tmp_event_id, slot_booking_enabled')
-          .in('tmp_event_id', truckersMPIds);
+        // Fetch booking enabled states from new event_booking_settings table
+        const eventIds = data.events.map((e: Event) => e.id.toString());
+        const { data: bookingSettings } = await supabase
+          .from('event_booking_settings')
+          .select('truckersmp_event_id, booking_enabled')
+          .in('truckersmp_event_id', eventIds);
         
         const toggleStates: Record<number, boolean> = {};
-        dbEvents?.forEach(e => {
-          if (e.tmp_event_id) {
-          toggleStates[Number(e.tmp_event_id)] = e.slot_booking_enabled ?? true;
-          }
+        bookingSettings?.forEach(s => {
+          toggleStates[parseInt(s.truckersmp_event_id)] = s.booking_enabled ?? true;
         });
         setBookingToggleStates(toggleStates);
-        setEvents(apiEvents.slice(0, 10));
+        
+        setEvents(data.events.slice(0, 10));
       }
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -208,27 +206,40 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
     setLoading(false);
   };
 
-  const handleToggleBookingSystem = async (truckersMPId: number, eventId: number, isEnabled: boolean) => {
-    
-    setActionLoading(`toggle-${truckersMPId}`);
+  const handleToggleBookingSystem = async (eventId: number, enabled: boolean) => {
+    setActionLoading(`toggle-${eventId}`);
     try {
-      const event = events.find(e => e.id === truckersMPId );
-      const { error } = await supabase
-        .from('events')
-        .upsert({
-          
-        tmp_event_id: truckersMPId,      
-        slot_booking_enabled: isEnabled,
-          title: event?.name || 'Event',
-          start_time: event?.start_at || new Date().toISOString(),
-        }, { onConflict: 'tmp_event_id' });
+      // Use the new event_booking_settings table with TruckersMP event ID as text
+      const { data: existingSetting } = await supabase
+        .from('event_booking_settings')
+        .select('id')
+        .eq('truckersmp_event_id', eventId.toString())
+        .maybeSingle();
 
-      if (error) throw error;
+      if (existingSetting) {
+        // Update existing setting
+        const { error } = await supabase
+          .from('event_booking_settings')
+          .update({ booking_enabled: enabled })
+          .eq('truckersmp_event_id', eventId.toString());
 
-      setBookingToggleStates(prev => ({ ...prev, [truckersMPId]: isEnabled, [eventId]: isEnabled }));
+        if (error) throw error;
+      } else {
+        // Insert new setting
+        const { error } = await supabase
+          .from('event_booking_settings')
+          .insert({
+            truckersmp_event_id: eventId.toString(),
+            booking_enabled: enabled,
+          });
+
+        if (error) throw error;
+      }
+
+      setBookingToggleStates(prev => ({ ...prev, [eventId]: enabled }));
       toast.success(`Slot booking ${enabled ? 'enabled' : 'disabled'} for this event`);
     } catch (error: any) {
-      console.error("Database Error:", error.message);
+      console.error('Toggle error:', error);
       toast.error(error.message || 'Failed to update booking status');
     } finally {
       setActionLoading(null);
@@ -473,7 +484,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
               Booking System Toggle
             </h3>
             <div className="space-y-2 max-h-40 overflow-y-auto">
-              {events.slice(0, 5).map((event) => (
+              {events.slice(0, 6).map((event) => (
                 <div
                   key={event.id}
                   className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 border border-border/30"
