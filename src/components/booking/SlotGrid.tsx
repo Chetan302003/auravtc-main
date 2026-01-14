@@ -25,6 +25,23 @@ interface SlotGridProps {
   eventBanner?: string | null;
 }
 
+// Convert Google Drive link to direct image URL
+const convertToDirectImageUrl = (url: string): string => {
+  if (!url) return '';
+  
+  // Handle Google Drive links
+  if (url.includes('drive.google.com')) {
+    const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch) {
+      return `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w800`;
+    }
+  }
+  
+  // Return original URL for ImageBB and other direct links
+  return url;
+};
+
+
 const SlotGrid = ({ slots, onSlotSelect, selectedSlot, eventBanner }: SlotGridProps) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -53,7 +70,8 @@ const SlotGrid = ({ slots, onSlotSelect, selectedSlot, eventBanner }: SlotGridPr
   };
 
   const getSlotImage = (slot: Slot): string | null => {
-    return slot.slot_image_url || eventBanner || null;
+    const url = slot.slot_image_url || eventBanner || null;
+    return url ? convertToDirectImageUrl(url) : null;
   };
 
   return (
