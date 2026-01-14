@@ -316,7 +316,10 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
                   rows={2}
                 />
               </div>
-              <div className="space-y-2">
+               <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Instagram className="w-4 h-4 text-pink-500" />
+                  Instagram Post URL (Optional)
                 <label className="text-sm font-medium">Instagram Post URL (Optional)</label>
                 <Input
                   placeholder="https://instagram.com/p/..."
@@ -324,7 +327,7 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
                   onChange={(e) => setFormInstagramUrl(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Link to the Instagram post (you'll need to manually upload to Instagram)
+                  Link to the Instagram post
                 </p>
               </div>
             </div>
