@@ -316,18 +316,18 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
                   rows={2}
                 />
               </div>
-               <div className="space-y-2">
+              <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Instagram className="w-4 h-4 text-pink-500" />
                   Instagram Post URL (Optional)
-                <label className="text-sm font-medium">Instagram Post URL (Optional)</label>
+                </label>
                 <Input
                   placeholder="https://instagram.com/p/..."
                   value={formInstagramUrl}
                   onChange={(e) => setFormInstagramUrl(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Link to the Instagram post
+                  Link to the Instagram post for cross-reference
                 </p>
               </div>
             </div>
