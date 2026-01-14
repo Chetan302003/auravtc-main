@@ -68,6 +68,30 @@ export type Database = {
           },
         ]
       }
+     event_booking_settings: {
+        Row: {
+          booking_enabled: boolean
+          created_at: string
+          id: string
+          truckersmp_event_id: string
+          updated_at: string
+        }
+        Insert: {
+          booking_enabled?: boolean
+          created_at?: string
+          id?: string
+          truckersmp_event_id: string
+          updated_at?: string
+        }
+        Update: {
+          booking_enabled?: boolean
+          created_at?: string
+          id?: string
+          truckersmp_event_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       event_slots: {
         Row: {
           created_at: string
@@ -403,6 +427,30 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+                  }
+        Relationships: []
+      }
+      vtc_settings: {
+        Row: {
+          id: string
+          setting_key: string
+          setting_value: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          setting_key: string
+          setting_value: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          setting_key?: string
+          setting_value?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
