@@ -32,7 +32,7 @@ interface TruckersMPEvent {
 }
 
 const Events = () => {
-  const [Events, setEvents] = useState<TruckersMPEvent[]>([]);
+  const [events, setEvents] = useState<TruckersMPEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [attendingEvents, setAttendingEvents] = useState<TruckersMPEvent[]>([]);
