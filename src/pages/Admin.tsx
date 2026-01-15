@@ -26,7 +26,7 @@ import SystemLogs from '@/components/admin/SystemLogs';
 import SlotManagement from '@/components/admin/SlotManagement';
 import GalleryManagement from '@/components/admin/GalleryManagement';
 import VTCSettingsManagement from '@/components/admin/VTCSettingsManagement';
-
+import UserManagement from '@/components/admin/UserManagement';
 interface Member {
   id: string;
   tmp_id: number;
@@ -391,7 +391,7 @@ const Admin = () => {
                 </div>
               </div>
               
-              <div className="overflow-x-auto max-h-80 sm:max-h-96">
+               <div className="overflow-x-auto max-h-80 sm:max-h-96 min-h-0">
                 {dataLoading ? (
                   <div className="flex items-center justify-center p-8 sm:p-12">
                     <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-primary" />
@@ -602,7 +602,17 @@ const Admin = () => {
             transition={{ duration: 0.5, delay: 0.78 }}
             className="mt-6"
           >
-            <GalleryManagement isAdmin={isAdmin} />
+          <GalleryManagement isAdmin={isAdmin} />
+          </motion.div>
+
+          {/* User Management - Full Width */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.79 }}
+            className="mt-6"
+          >
+            <UserManagement isAdmin={isAdmin} />
           </motion.div>
 
           {/* System Logs - Full Width */}
