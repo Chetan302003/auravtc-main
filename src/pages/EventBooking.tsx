@@ -44,7 +44,7 @@ const EventBooking = () => {
   const [loading, setLoading] = useState(true);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
-
+  const [bookingEnabled, setBookingEnabled] = useState(true);
   const fetchEvent = async () => {
     try {
       const { data, error } = await supabase.functions.invoke('truckersmp-vtc-events');
@@ -52,6 +52,17 @@ const EventBooking = () => {
       
       const foundEvent = data.events?.find((e: TruckersMPEvent) => e.id.toString() === eventId);
       setEvent(foundEvent || null);
+      
+      // Check if booking is enabled for this event
+      if (eventId) {
+        const { data: settings } = await supabase
+          .from('event_booking_settings')
+          .select('booking_enabled')
+          .eq('truckersmp_event_id', eventId)
+          .maybeSingle();
+
+        setBookingEnabled(settings?.booking_enabled ?? true);
+      }
     } catch (err) {
       console.error('Error fetching event:', err);
       toast.error('Failed to load event details');
@@ -296,12 +307,28 @@ const EventBooking = () => {
                     </div>
                   </div>
 
-                  <SlotGrid 
-                    slots={slots} 
-                    onSlotSelect={handleSlotSelect}
-                    selectedSlot={selectedSlot}
-                    eventBanner={event.banner}
-                  />
+                  {!bookingEnabled ? (
+                    <div className="text-center py-12 px-4">
+                      <div className="glass-card rounded-2xl p-8 border-2 border-destructive/30 bg-destructive/5">
+                        <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center mx-auto mb-4">
+                          <Truck className="w-8 h-8 text-destructive" />
+                        </div>
+                        <h3 className="font-display text-xl font-bold text-destructive mb-2">
+                          Bookings Closed
+                        </h3>
+                        <p className="text-muted-foreground">
+                          Sorry, bookings are closed for this event. Please check back later or contact management for more information.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <SlotGrid 
+                      slots={slots} 
+                      onSlotSelect={handleSlotSelect}
+                      selectedSlot={selectedSlot}
+                      eventBanner={event.banner}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -309,10 +336,14 @@ const EventBooking = () => {
               <div className="lg:col-span-1">
                 <div className="glass-card rounded-2xl p-6 sm:p-8 sticky top-24">
                   <h2 className="font-display text-xl font-bold mb-4">
-                    {showForm ? `Book Slot #${selectedSlot}` : 'Select a Slot'}
+                   {!bookingEnabled ? 'Bookings Closed' : showForm ? `Book Slot #${selectedSlot}` : 'Select a Slot'}
                   </h2>
                   
-                  {showForm && selectedSlot ? (
+                  {!bookingEnabled ? (
+                    <p className="text-muted-foreground text-sm">
+                      Slot bookings are currently closed for this event. Please check back later.
+                    </p>
+                  ) : showForm && selectedSlot ? (
                     <BookingForm 
                       eventId={eventId!}
                       slotNumber={selectedSlot}
