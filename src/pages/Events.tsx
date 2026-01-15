@@ -32,49 +32,65 @@ interface TruckersMPEvent {
 }
 
 const Events = () => {
-  const [events, setEvents] = useState<TruckersMPEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [vtcEvents, setVtcEvents] = useState<TruckersMPEvent[]>([]);
   const [attendingEvents, setAttendingEvents] = useState<TruckersMPEvent[]>([]);
+  const [loadingVtc, setLoadingVtc] = useState(true);
+  const [loadingAttending, setLoadingAttending] = useState(true);
+  const [errorVtc, setErrorVtc] = useState<string | null>(null);
+  const [errorAttending, setErrorAttending] = useState<string | null>(null);
 
-const fetchEvents = async (isRefresh = false) => {
-    if (!isRefresh) setLoading(true);
+  const fetchVtcEvents = async (isRefresh = false) => {
+    if (!isRefresh) setLoadingVtc(true);
     try {
-      // Fetch both hosted and attending events simultaneously
-      const [hostedResponse, attendingResponse] = await Promise.all([
-        supabase.functions.invoke('truckersmp-events'),
-        supabase.functions.invoke('truckersmp-events-attending')
-      ]);
+      const { data, error } = await supabase.functions.invoke('truckersmp-vtc-events');
       
-      if (hostedResponse.error) throw hostedResponse.error;
-      if (attendingResponse.error) throw attendingResponse.error;
+      if (error) throw error;
       
-      setEvents(hostedResponse.data.events || []);
-      // Limit to 6 attending events 
-      setAttendingEvents((attendingResponse.data.events || []).slice(0, 6));
-      setError(null);
+      setVtcEvents(data.events || []);
+      setErrorVtc(null);
     } catch (err) {
-      console.error('Error fetching events:', err);
-      if (!isRefresh) setError('Failed to load events');
+      console.error('Error fetching VTC events:', err);
+      if (!isRefresh) setErrorVtc('Failed to load VTC events');
     } finally {
-      setLoading(false);
+      setLoadingVtc(false);
+    }
+  };
+
+  const fetchAttendingEvents = async (isRefresh = false) => {
+    if (!isRefresh) setLoadingAttending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('truckersmp-events');
+      
+      if (error) throw error;
+      
+      setAttendingEvents(data.events || []);
+      setErrorAttending(null);
+    } catch (err) {
+      console.error('Error fetching attending events:', err);
+      if (!isRefresh) setErrorAttending('Failed to load attending events');
+    } finally {
+      setLoadingAttending(false);
     }
   };
 
   useEffect(() => {
-    fetchEvents();
+    fetchVtcEvents();
+    fetchAttendingEvents();
     
     // Auto-refresh every 60 seconds
-    const interval = setInterval(() => fetchEvents(true), 60000);
+    const interval = setInterval(() => {
+      fetchVtcEvents(true);
+      fetchAttendingEvents(true);
+    }, 300000);
     return () => clearInterval(interval);
   }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      weekday: 'long',
+      weekday: 'short',
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
     });
   };
@@ -88,197 +104,190 @@ const fetchEvents = async (isRefresh = false) => {
     });
   };
 
+  const EventCard = ({ event, index, isVtcEvent = false }: { event: TruckersMPEvent; index: number; isVtcEvent?: boolean }) => (
+    <div
+      key={event.id}
+      className="group glass-card rounded-xl sm:rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500 hover:glow-border animate-slide-up flex flex-col hover:-translate-y-2"
+      style={{ animationDelay: `${index * 0.1}s` }}
+    >
+      {/* Event Banner */}
+      <div className="relative aspect-video overflow-hidden">
+        <img 
+          src={event.banner || 'https://truckersmp.com/assets/images/default_event_banner.jpg'} 
+          alt={event.name}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
+          <span className="px-2 py-1 rounded-full text-[10px] sm:text-xs font-medium bg-primary/90 text-primary-foreground font-display">
+            {event.game.toUpperCase()}
+          </span>
+        </div>
+      </div>
+      
+      <div className="p-4 sm:p-5 space-y-2 sm:space-y-3 flex-1">
+        <h3 className="font-display text-sm sm:text-base lg:text-lg font-bold text-foreground line-clamp-2 group-hover:text-primary transition-colors break-words">
+          {event.name}
+        </h3>
+        
+        <span className="inline-block px-2 py-1 rounded-full text-[10px] sm:text-xs font-medium border bg-accent/10 text-accent border-accent/30">
+          {event.server.name}
+        </span>
+        
+        <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+            <span className="truncate">{formatDate(event.start_at)}</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+            <span className="truncate">{formatTime(event.start_at)}</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+            <span className="truncate">{event.departure.city} → {event.arrive.city}</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Users className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+            <span>{event.attendances.confirmed} confirmed</span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0 space-y-3">
+        {/* Book Slot Button - Only for VTC Events */}
+        {isVtcEvent && (
+          <Link to={`/events/${event.id}/book`} className="w-full block">
+            <Button variant="glow" className="w-full text-sm">
+              <Ticket className="w-3 h-3 sm:w-4 sm:h-4" />
+              Book Slot
+            </Button>
+          </Link>
+        )}
+        
+        {/* View on TruckersMP */}
+        <a
+          href={`https://truckersmp.com/events/${event.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full block"
+        >
+          <Button variant={isVtcEvent ? "outline" : "glow"} className="w-full text-sm">
+            View on TruckersMP
+            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+          </Button>
+        </a>
+      </div>
+    </div>
+  );
+
+  const EventsSection = ({ 
+    title, 
+    subtitle, 
+    events, 
+    loading, 
+    error, 
+    icon: Icon,
+    isVtcEvent = false
+  }: { 
+    title: string; 
+    subtitle: string; 
+    events: TruckersMPEvent[]; 
+    loading: boolean; 
+    error: string | null;
+    icon: React.ComponentType<{ className?: string }>;
+    isVtcEvent?: boolean;
+  }) => (
+    <div className="mb-12 sm:mb-16">
+      {/* Section Header */}
+      <div className="text-center mb-6 sm:mb-10 space-y-2 sm:space-y-3 animate-slide-up">
+        <div className="flex items-center justify-center gap-2 sm:gap-3">
+          <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+          <h2 className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">
+            <span className="text-primary glow-text">{title}</span>
+          </h2>
+        </div>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto px-4">{subtitle}</p>
+        <div className="neon-line max-w-xs mx-auto" />
+      </div>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-12 sm:py-16">
+          <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 text-primary animate-spin" />
+          <span className="ml-3 text-sm sm:text-base text-muted-foreground">Loading events...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div className="text-center py-12 sm:py-16">
+          <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-destructive mx-auto mb-3" />
+          <h3 className="font-display text-lg sm:text-xl font-bold mb-2">Error Loading Events</h3>
+          <p className="text-sm sm:text-base text-muted-foreground">{error}</p>
+        </div>
+      )}
+
+      {/* Events Grid */}
+      {!loading && !error && events.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
+          {events.map((event, index) => (
+            <EventCard key={event.id} event={event} index={index} isVtcEvent={isVtcEvent} />
+          ))}
+        </div>
+      )}
+
+      {/* No Events Fallback */}
+      {!loading && !error && events.length === 0 && (
+        <div className="text-center py-12 sm:py-16">
+          <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-3" />
+          <h3 className="font-display text-lg sm:text-xl font-bold mb-2">No Upcoming Events</h3>
+          <p className="text-sm sm:text-base text-muted-foreground">Check back soon for new announcements!</p>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <PageTransition>
     <Layout>
-      <section className="py-24 min-h-screen">
+      <section className="py-16 sm:py-20 md:py-24 min-h-screen">
         <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="text-center mb-16 space-y-4 animate-slide-up">
-            <span className="px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-sm tracking-widest inline-block">
+          <div className="text-center mb-10 sm:mb-16 space-y-3 sm:space-y-4 animate-slide-up">
+            <span className="px-3 sm:px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-xs sm:text-sm tracking-widest inline-block">
               JOIN THE ACTION
             </span>
-            <h1 className="font-display text-5xl md:text-6xl font-bold">
+            <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold">
               <span className="text-foreground">Upcoming </span>
               <span className="text-primary glow-text">Events</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
               Participate in our organized convoys and special events
             </p>
             <div className="neon-line max-w-xs mx-auto" />
           </div>
 
-          {/* Loading State */}
-          {loading && (
-            <div className="flex justify-center items-center py-20">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <span className="ml-3 text-muted-foreground">Loading events...</span>
-            </div>
-          )}
-          
-          {/* Error State */}
-          {error && !loading && (
-            <div className="text-center py-20">
-              <Calendar className="w-16 h-16 text-destructive mx-auto mb-4" />
-              <h3 className="font-display text-2xl font-bold mb-2">Error Loading Events</h3>
-              <p className="text-muted-foreground">{error}</p>
-            </div>
-          )}
+          {/* Our VTC Events Section */}
+          <EventsSection
+            title="Our VTC Events"
+            subtitle="Events organized and hosted by Aura VTC - Book your convoy slot!"
+            events={vtcEvents}
+            loading={loadingVtc}
+            error={errorVtc}
+            icon={Truck}
+            isVtcEvent={true}
+          />
 
-          {/* Events Grid - 2x3 layout */}
-          {!loading && !error && events.length > 0 && (
-            <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-              {events.map((event, index) => (
-                <div
-                  key={event.id}
-                  className="group glass-card rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500 hover:glow-border animate-slide-up flex flex-col hover:-translate-y-2"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  {/* Event Banner */}
-                  <div className="relative aspect-video md:aspect-auto overflow-hidden bg-secondary/30">
-                    <img 
-                      src={event.banner || 'https://truckersmp.com/assets/images/default_event_banner.jpg'} 
-                      alt={event.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-                    <div className="absolute top-3 right-3">
-                      <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-tighter">
-                        {event.game.toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-5 space-y-3 flex-1">
-                    <h3 className="font-display text-lg font-bold text-foreground line-clamp-2 group-hover:text-primary transition-colors">
-                      {event.name}
-                    </h3>
-                    
-                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium border bg-accent/10 text-accent border-accent/30">
-                      {event.server.name}
-                    </span>
-                    
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span>{formatDate(event.start_at)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Clock className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span>{formatTime(event.start_at)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="truncate">{event.departure.city} → {event.arrive.city}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Users className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span>{event.attendances.confirmed} confirmed</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="px-6 pb-6 pt-0 mb-3 space-y-2">
-                    <Link to={`/events/${event.id}/book`} className="w-full block">
-                     <Button variant="glow" className="w-full text-sm">
-                      <Ticket className="w-4 h-4 mr-2" />
-                        Book Slot
-                       </Button>
-                      </Link>
-                    <a
-                      href={`https://truckersmp.com/events/${event.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full"
-                    >
-                      <Button variant="glow" className="w-full">
-                        View Event
-                        <ExternalLink className="w-4 h-4" />
-                      </Button>
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          {/* Section Divider */}
-          {!loading && !error && attendingEvents.length > 0 && (
-            <div className="mt-32 mb-16 space-y-4 text-center animate-slide-up">
-              <span className="px-4 py-2 rounded-full border border-primary/30 bg-primary/5 text-primary font-display text-sm tracking-widest inline-block uppercase">
-                VTC Participation
-              </span>
-              <h2 className="font-display text-4xl md:text-5xl font-bold">
-                Events We're <span className="text-primary glow-text">Attending</span>
-              </h2>
-              <div className="neon-line max-w-xs mx-auto" />
-            </div>
-          )}
-
-          {/* Attending Events Grid */}
-          {!loading && !error && attendingEvents.length > 0 && (
-            <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto"> 
-              {attendingEvents.map((event, index) => (
-                <div
-                  key={`attending-${event.id}`}
-                  className="group glass-card rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500 hover:glow-border animate-slide-up flex flex-col hover:-translate-y-2"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                   {/* Attending Event Banner */}
-                  <div className="relative aspect-video md:aspect-auto overflow-hidden bg-secondary/30">
-                    <img 
-                      src={event.banner || 'https://truckersmp.com/assets/images/default_event_banner.jpg'} 
-                      alt={event.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
-                    <div className="absolute top-3 right-3">
-                      <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-primary text-primary-foreground uppercase tracking-tighter">
-                        Attending
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-5 flex flex-col flex-1 space-y-4">
-                    <h3 className="font-display text-lg font-bold text-foreground line-clamp-2 min-h-[3rem] group-hover:text-primary transition-colors">
-                      {event.name}
-                    </h3>
-
-                    <div className="space-y-2 text-[13px]">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="w-4 h-4 text-primary shrink-0" />
-                        <span className="truncate">{formatDate(event.start_at)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Clock className="w-4 h-4 text-primary shrink-0" />
-                        <span>{formatTime(event.start_at)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <MapPin className="w-4 h-4 text-primary shrink-0" />
-                        <span className="truncate">{event.departure.city} → {event.arrive.city}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-4 mt-auto">
-                      <a href={`https://truckersmp.com/events/${event.slug}`} target="_blank" rel="noopener noreferrer">
-                        <Button variant="glow" className="w-full text-xs font-bold uppercase tracking-widest">
-                          Event Link <ExternalLink className="w-4 h-4 ml-2" />
-                        </Button>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* No Events Fallback */}
-          {!loading && !error && events.length === 0 && (
-            <div className="text-center py-20">
-              <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="font-display text-2xl font-bold mb-2">No Upcoming Events</h3>
-              <p className="text-muted-foreground">Check back soon for new convoy announcements!</p>
-            </div>
-          )}
+          {/* Events We're Attending Section */}
+          <EventsSection
+            title="Events We're Attending"
+            subtitle="Join us at these community events"
+            events={attendingEvents}
+            loading={loadingAttending}
+            error={errorAttending}
+            icon={Users}
+          />
         </div>
       </section>
     </Layout>
