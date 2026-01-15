@@ -130,6 +130,27 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
 
       if (error) throw error;
 
+            if (formType === 'image' && formMediaUrl) {
+        try {
+          const { data: instaData, error: instaError } = await supabase.functions.invoke('post-to-instagram', {
+            body: {
+              image_url: formMediaUrl,
+              caption: formDescription || '',
+              title: formTitle || undefined,
+            },
+          });
+          
+          if (instaError) {
+            console.error('Instagram post failed:', instaError);
+            toast.warning('Item added but Instagram post failed');
+          } else if (instaData?.success && instaData?.instagram_url) {
+            toast.success('Posted to Instagram!');
+          }
+        } catch (instaErr) {
+          console.error('Instagram integration error:', instaErr);
+        }
+      }
+
       toast.success('Gallery item added successfully');
       setIsAddDialogOpen(false);
       resetForm();
@@ -256,7 +277,7 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
               Add Item
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle>Add Gallery Item</DialogTitle>
               <DialogDescription>
@@ -264,7 +285,7 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              <div className="space-y-2">
+              <div className="space-y-4 py-4 overflow-y-auto flex-1">
                 <label className="text-sm font-medium">Type</label>
                 <Select value={formType} onValueChange={(v) => setFormType(v as 'image' | 'video')}>
                   <SelectTrigger>
