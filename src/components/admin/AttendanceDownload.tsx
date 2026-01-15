@@ -141,17 +141,17 @@ const AttendanceDownload = ({ isAdmin }: AttendanceDownloadProps) => {
         </div>
 
         {/* Date range pickers */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
+          <div className="min-w-0">
             <label className="text-xs text-muted-foreground mb-1 block">Start Date</label>
             <Popover open={isStartOpen} onOpenChange={setIsStartOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal text-sm border-border/50 hover:border-primary/50"
+                  className="w-full justify-start text-left font-normal text-xs sm:text-sm border-border/50 hover:border-primary/50 overflow-hidden"
                 >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {format(startDate, 'MMM d, yyyy')}
+                  <Calendar className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span className="truncate">{format(startDate, 'MMM d, yy')}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 bg-background border-border" align="start">
@@ -170,16 +170,16 @@ const AttendanceDownload = ({ isAdmin }: AttendanceDownloadProps) => {
             </Popover>
           </div>
           
-          <div>
+          <div className="min-w-0">
             <label className="text-xs text-muted-foreground mb-1 block">End Date</label>
             <Popover open={isEndOpen} onOpenChange={setIsEndOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal text-sm border-border/50 hover:border-primary/50"
+                  className="w-full justify-start text-left font-normal text-xs sm:text-sm border-border/50 hover:border-primary/50 overflow-hidden"
                 >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {format(endDate, 'MMM d, yyyy')}
+                  <Calendar className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span className="truncate">{format(endDate, 'MMM d, yy')}</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 bg-background border-border" align="start">
