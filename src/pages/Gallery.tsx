@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, Image as ImageIcon, Play, X } from 'lucide-react';
+import { Loader2, Image as ImageIcon, Play, X, Star } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import PageTransition from '@/components/layout/PageTransition';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,6 +19,7 @@ interface GalleryItem {
 
 const Gallery = () => {
   const [items, setItems] = useState<GalleryItem[]>([]);
+  const [featuredItem, setFeaturedItem] = useState<GalleryItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
   const [hoveredVideo, setHoveredVideo] = useState<string | null>(null);
@@ -35,7 +36,13 @@ const Gallery = () => {
         .order('display_order', { ascending: true });
 
       if (error) throw error;
-      setItems((data as GalleryItem[]) || []);
+      
+      const allItems = (data as GalleryItem[]) || [];
+      const featured = allItems.find(item => item.is_featured && item.type === 'image');
+      const regularItems = allItems.filter(item => !item.is_featured || item.type !== 'image' || item.id !== featured?.id);
+      
+      setFeaturedItem(featured || null);
+      setItems(regularItems);
     } catch (err) {
       console.error('Error fetching gallery:', err);
     } finally {
@@ -57,6 +64,16 @@ const Gallery = () => {
       if (match) {
         return `https://www.youtube.com/embed/${match[1]}?autoplay=1&mute=1`;
       }
+    }
+    // Terabox embed - extract share ID and create embed URL
+    if (url.includes('terabox.com') || url.includes('teraboxapp.com') || url.includes('1024terabox.com')) {
+      // Handle various terabox URL formats
+      const shareMatch = url.match(/\/s\/([a-zA-Z0-9_-]+)/);
+      if (shareMatch) {
+        return `https://www.terabox.com/sharing/embed?surl=${shareMatch[1]}`;
+      }
+      // Direct video link
+      return url;
     }
     return url;
   };
@@ -91,6 +108,59 @@ const Gallery = () => {
               </p>
               <div className="neon-line max-w-xs mx-auto" />
             </div>
+
+            {/* Picture of the Month */}
+            {!loading && featuredItem && (
+              <div className="mb-12 sm:mb-16 max-w-4xl mx-auto animate-slide-up">
+                <div className="flex items-center gap-3 mb-6">
+                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                  <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">
+                    Picture of the Month
+                  </h2>
+                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                </div>
+                <div
+                  className="relative group rounded-2xl overflow-hidden border-2 border-yellow-500/50 hover:border-yellow-500 transition-all duration-500 cursor-pointer shadow-[0_0_30px_rgba(234,179,8,0.2)] hover:shadow-[0_0_50px_rgba(234,179,8,0.4)]"
+                  onClick={() => setSelectedItem(featuredItem)}
+                >
+                  <div className="aspect-[21/9] sm:aspect-[21/9]">
+                    <img
+                      src={featuredItem.media_url}
+                      alt={featuredItem.title || 'Picture of the Month'}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                  
+                  {/* Featured Badge */}
+                  <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-yellow-500/90 text-yellow-950 font-display text-xs font-bold flex items-center gap-1.5">
+                    <Star className="w-3 h-3 fill-current" />
+                    FEATURED
+                  </div>
+                  
+                  {/* Content Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                    <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-2">
+                      {featuredItem.title || 'Picture of the Month'}
+                    </h3>
+                    {featuredItem.description && (
+                      <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
+                        {featuredItem.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Section Divider */}
+            {!loading && featuredItem && items.length > 0 && (
+              <div className="flex items-center gap-4 mb-10 max-w-6xl mx-auto">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                <span className="text-sm text-muted-foreground font-display tracking-wider">ALL MEDIA</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+              </div>
+            )}
 
             {/* Loading State */}
             {loading && (
