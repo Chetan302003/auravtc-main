@@ -622,7 +622,7 @@ const Admin = () => {
             transition={{ duration: 0.5, delay: 0.8 }}
             className="mt-6"
           >
-            <SystemLogs isAdmin={isAdmin} source="check-attendance" title="Attendance Logs" />
+            <SystemLogs isAdmin={isAdmin}  />
           </motion.div>
           {/* User Info Footer */}
           <motion.div
