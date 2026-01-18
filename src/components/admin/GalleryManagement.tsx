@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -43,6 +44,7 @@ import {
   ArrowDown,
   Instagram,
   ExternalLink,
+  Star,
 } from 'lucide-react';
 
 interface GalleryItem {
@@ -130,7 +132,8 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
 
       if (error) throw error;
 
-            if (formType === 'image' && formMediaUrl) {
+      // Trigger Instagram post if image type and has valid URL
+      if (formType === 'image' && formMediaUrl) {
         try {
           const { data: instaData, error: instaError } = await supabase.functions.invoke('post-to-instagram', {
             body: {
@@ -213,6 +216,33 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
     }
   };
 
+  const handleToggleFeatured = async (id: string, featured: boolean) => {
+    setActionLoading(id);
+    try {
+      // If setting as featured, unset all other featured items first
+      if (featured) {
+        await supabase
+          .from('gallery_items')
+          .update({ is_featured: false })
+          .eq('type', 'image');
+      }
+
+      const { error } = await supabase
+        .from('gallery_items')
+        .update({ is_featured: featured })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success(featured ? 'Set as Picture of the Month' : 'Removed from featured');
+      fetchItems();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update featured status');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleMoveItem = async (id: string, direction: 'up' | 'down') => {
     const index = items.findIndex(i => i.id === id);
     if ((direction === 'up' && index === 0) || (direction === 'down' && index === items.length - 1)) {
@@ -284,8 +314,8 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
                 Add a new image or video to the gallery. Images use ImageBB links, videos use Google Drive or YouTube links.
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-4 py-4 overflow-y-auto flex-1">
+            <div className="space-y-4 py-4 overflow-y-auto flex-1">
+              <div className="space-y-2">
                 <label className="text-sm font-medium">Type</label>
                 <Select value={formType} onValueChange={(v) => setFormType(v as 'image' | 'video')}>
                   <SelectTrigger>
@@ -308,14 +338,14 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Media URL *</label>
                 <Input
-                  placeholder={formType === 'image' ? 'ImageBB direct link' : 'Google Drive or YouTube URL'}
+                  placeholder={formType === 'image' ? 'ImageBB direct link' : 'Google Drive, YouTube, or Terabox URL'}
                   value={formMediaUrl}
                   onChange={(e) => setFormMediaUrl(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
                   {formType === 'image' 
                     ? 'Use ImageBB direct link (e.g., https://i.ibb.co/...)'
-                    : 'Paste Google Drive share link or YouTube URL'}
+                    : 'Supports Google Drive, YouTube, or Terabox links'}
                 </p>
               </div>
               {formType === 'video' && (
@@ -405,6 +435,12 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
                     <Badge variant="outline" className="text-xs">
                       {item.type}
                     </Badge>
+                    {item.is_featured && item.type === 'image' && (
+                      <Badge className="text-xs bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
+                        <Star className="w-3 h-3 mr-1 fill-current" />
+                        Featured
+                      </Badge>
+                    )}
                   </div>
                   {item.instagram_url && (
                     <a
@@ -419,6 +455,18 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
                     </a>
                   )}
                 </div>
+
+                {/* Featured Toggle for Images */}
+                {item.type === 'image' && (
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-muted-foreground">Featured</label>
+                    <Switch
+                      checked={item.is_featured}
+                      onCheckedChange={(checked) => handleToggleFeatured(item.id, checked)}
+                      disabled={!!actionLoading}
+                    />
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex items-center gap-1">
