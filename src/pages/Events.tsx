@@ -178,7 +178,7 @@ const Events = () => {
                     </div>
                   </div>
                   
-                  <div className="px-6 pb-6 pt-0 mb-3 space-y-2">
+                  <div className="px-6 pb-6 pt-0 mb-3 flex flex-col gap-1">
                     <Link to={`/events/${event.id}/book`} className="w-full block">
                      <Button variant="glow" className="w-full text-sm">
                       <Ticket className="w-4 h-4 mr-2" />
