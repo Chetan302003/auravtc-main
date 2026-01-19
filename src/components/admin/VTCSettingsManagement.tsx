@@ -3,8 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Settings, Save, Loader2, Users, Truck, Route, Calendar } from 'lucide-react';
+import { Settings, Save, Loader2, Users, Truck, Route, Calendar, Eye, UserCheck } from 'lucide-react';
 
 interface VTCSettingsManagementProps {
   isAdmin: boolean;
@@ -17,8 +18,10 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
     distance_covered: '0 km',
     founded_date: 'Est. 2024',
   });
+  const [attendanceEnabled, setAttendanceEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [togglingAttendance, setTogglingAttendance] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -44,6 +47,7 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
           distance_covered: settingsMap['distance_covered'] || '0 km',
           founded_date: settingsMap['founded_date'] || 'Est. 2024',
         });
+        setAttendanceEnabled(settingsMap['attendance_enabled'] !== 'false');
       }
     } catch (error) {
       console.error('Error fetching VTC settings:', error);
@@ -77,6 +81,35 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
       toast.error(error.message || 'Failed to save settings');
     } finally {
       setSaving(false);
+          }
+  };
+
+  const handleToggleAttendance = async (enabled: boolean) => {
+    setTogglingAttendance(true);
+    try {
+      const { data: existing } = await supabase
+        .from('vtc_settings')
+        .select('id')
+        .eq('setting_key', 'attendance_enabled')
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from('vtc_settings')
+          .update({ setting_value: enabled.toString() })
+          .eq('setting_key', 'attendance_enabled');
+      } else {
+        await supabase
+          .from('vtc_settings')
+          .insert({ setting_key: 'attendance_enabled', setting_value: enabled.toString() });
+      }
+      
+      setAttendanceEnabled(enabled);
+      toast.success(`Attendance system ${enabled ? 'enabled' : 'disabled'}`);
+    } catch (error: any) {
+      toast.error('Failed to update attendance setting');
+    } finally {
+      setTogglingAttendance(false);
     }
   };
 
@@ -110,7 +143,21 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
           Manage the statistics displayed on the homepage
         </p>
       </div>
-
+        {/* Attendance System Toggle */}
+        <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/30 border border-border/30">
+          <div className="flex items-center gap-3">
+            <UserCheck className="w-5 h-5 text-primary" />
+            <div>
+              <p className="font-medium">Attendance System</p>
+              <p className="text-xs text-muted-foreground">Enable/disable automatic attendance checking</p>
+            </div>
+          </div>
+          <Switch
+            checked={attendanceEnabled}
+            onCheckedChange={handleToggleAttendance}
+            disabled={togglingAttendance}
+          />
+        </div>
       <div className="p-4 sm:p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
