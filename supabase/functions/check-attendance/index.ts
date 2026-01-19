@@ -68,6 +68,23 @@ Deno.serve(async (req) => {
 
     await log({ level: 'info', source: 'check-attendance', message: 'Request received', data: { runId, mode, eventId: eventId ?? null } });
 
+    // Check if attendance system is enabled (from vtc_settings)
+    const { data: attendanceSetting } = await supabase
+      .from('vtc_settings')
+      .select('setting_value')
+      .eq('setting_key', 'attendance_enabled')
+      .maybeSingle();
+
+    const isAttendanceEnabled = attendanceSetting?.setting_value !== 'false';
+
+    if (!isAttendanceEnabled) {
+      await log({ level: 'info', source: 'check-attendance', message: 'Attendance system is disabled' });
+      return new Response(
+        JSON.stringify({ success: true, message: 'Attendance system is disabled', skipped: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     if (mode === 'attendance' && !eventId) {
       await log({ level: 'error', source: 'check-attendance', message: 'Event ID is required for attendance mode' });
       throw new Error('Event ID is required');
