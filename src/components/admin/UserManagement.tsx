@@ -39,7 +39,18 @@ import {
   Users,
   Eye,
   EyeOff,
+  KeyRound,
+  UserX,
+  UserCheck,
+  MoreVertical,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import type { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
@@ -50,6 +61,7 @@ interface UserWithRole {
   display_name: string | null;
   created_at: string;
   roles: AppRole[];
+  is_banned?: boolean;
 }
 
 interface UserManagementProps {
@@ -81,6 +93,8 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   
   // Form state
   const [newEmail, setNewEmail] = useState('');
@@ -88,6 +102,8 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
   const [newDisplayName, setNewDisplayName] = useState('');
   const [selectedRole, setSelectedRole] = useState<AppRole>('user');
   const [showPassword, setShowPassword] = useState(false);
+  const [resetPassword, setResetPassword] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -146,34 +162,19 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
 
     setActionLoading('create');
     try {
-      // Create user using Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: newEmail,
-        password: newPassword,
-        options: {
-          data: {
-            display_name: newDisplayName || newEmail,
-          },
+      // Use the admin edge function to create user without affecting current session
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'create',
+          email: newEmail,
+          password: newPassword,
+          display_name: newDisplayName || newEmail,
+          role: selectedRole,
         },
       });
 
-      if (authError) throw authError;
-
-      if (authData.user) {
-        // Assign role to the user
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: authData.user.id,
-            role: selectedRole,
-          });
-
-        if (roleError) {
-          console.error('Role assignment error:', roleError);
-          // Don't throw - user is created, role assignment failed
-          toast.warning('User created but role assignment failed');
-        }
-      }
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       toast.success('User created successfully');
       setIsCreateDialogOpen(false);
@@ -184,6 +185,85 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
       fetchUsers();
     } catch (err: any) {
       toast.error(err.message || 'Failed to create user');
+          } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!selectedUserId || !resetPassword) {
+      toast.error('Password is required');
+      return;
+    }
+
+    if (resetPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    setActionLoading('reset');
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'reset_password',
+          user_id: selectedUserId,
+          new_password: resetPassword,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success('Password reset successfully');
+      setIsResetPasswordDialogOpen(false);
+      setResetPassword('');
+      setSelectedUserId(null);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to reset password');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeactivateUser = async (userId: string) => {
+    setActionLoading(`deactivate-${userId}`);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'deactivate',
+          user_id: userId,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success('User deactivated');
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: true } : u));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to deactivate user');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReactivateUser = async (userId: string) => {
+    setActionLoading(`reactivate-${userId}`);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'reactivate',
+          user_id: userId,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      toast.success('User reactivated');
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: false } : u));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to reactivate user');
     } finally {
       setActionLoading(null);
     }
@@ -226,6 +306,12 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
       setActionLoading(null);
     }
   };
+
+  const openResetPasswordDialog = (userId: string) => {
+    setSelectedUserId(userId);
+    setResetPassword('');
+    setIsResetPasswordDialogOpen(true);
+      };
 
   if (!isAdmin) {
     return (
@@ -323,6 +409,50 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
         </Dialog>
       </div>
 
+      {/* Reset Password Dialog */}
+      <Dialog open={isResetPasswordDialogOpen} onOpenChange={setIsResetPasswordDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-primary" />
+              Reset Password
+            </DialogTitle>
+            <DialogDescription>
+              Enter a new password for this user.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">New Password *</label>
+              <div className="relative">
+                <Input
+                  type={showResetPassword ? "text" : "password"}
+                  placeholder="Minimum 6 characters"
+                  value={resetPassword}
+                  onChange={(e) => setResetPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowResetPassword(!showResetPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showResetPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsResetPasswordDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleResetPassword} disabled={actionLoading === 'reset'}>
+              {actionLoading === 'reset' && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Reset Password
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Role Legend */}
       <div className="px-4 sm:px-6 py-3 bg-secondary/20 border-b border-border/30">
         <p className="text-xs text-muted-foreground mb-2">Role Access:</p>
@@ -349,7 +479,9 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
             {users.map((user) => (
               <div
                 key={user.id}
-                className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-lg bg-secondary/30 border border-border/30"
+                className={`flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-lg border border-border/30 ${
+                  user.is_banned ? 'bg-red-500/10' : 'bg-secondary/30'
+                }`}
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -358,6 +490,11 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
                     </p>
                     {user.roles.includes('admin') && (
                       <Shield className="w-4 h-4 text-red-400" />
+                                          )}
+                    {user.is_banned && (
+                      <Badge variant="outline" className="text-xs bg-red-500/20 text-red-400 border-red-500/30">
+                        Deactivated
+                      </Badge>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground truncate">{user.id}</p>
@@ -399,6 +536,39 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
                     }
                   </SelectContent>
                 </Select>
+
+                {/* Actions Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => openResetPasswordDialog(user.id)}>
+                      <KeyRound className="w-4 h-4 mr-2" />
+                      Reset Password
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    {user.is_banned ? (
+                      <DropdownMenuItem 
+                        onClick={() => handleReactivateUser(user.id)}
+                        className="text-green-500"
+                      >
+                        <UserCheck className="w-4 h-4 mr-2" />
+                        Reactivate User
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem 
+                        onClick={() => handleDeactivateUser(user.id)}
+                        className="text-destructive"
+                      >
+                        <UserX className="w-4 h-4 mr-2" />
+                        Deactivate User
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ))}
           </div>
