@@ -42,6 +42,39 @@ serve(async (req) => {
 
     console.log(`Booking ${booking_id} ${newStatus} by ${reviewer || 'Discord Staff'}`);
 
+    // Fetch slot data for the image
+    const { data: slotData } = await supabase
+      .from('event_slots')
+      .select('slot_image_url')
+      .eq('event_id', booking.event_id)
+      .eq('slot_number', booking.slot_number)
+      .maybeSingle();
+
+    // Fetch event details from TruckersMP API if event_id is numeric
+    let eventDetails: any = {};
+    try {
+      const eventResponse = await fetch(`https://api.truckersmp.com/v2/events/${booking.event_id}`);
+      if (eventResponse.ok) {
+        const eventData = await eventResponse.json();
+        if (eventData.response) {
+          const event = eventData.response;
+          eventDetails = {
+            event_name: event.name,
+            event_date: event.start_at ? new Date(event.start_at).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : undefined,
+            event_time: event.start_at ? new Date(event.start_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }) : undefined,
+            event_server: event.server?.name,
+            event_banner: event.banner,
+            meetup_location: event.meetup?.location,
+            destination: event.destination?.location,
+            departure_city: event.departure?.location,
+            arrival_city: event.arrive?.location,
+          };
+        }
+      }
+    } catch (eventFetchError) {
+      console.error('Failed to fetch event details:', eventFetchError);
+    }
+
     // Send email notification if contact_email exists
     if (booking.contact_email) {
       try {
@@ -56,7 +89,17 @@ serve(async (req) => {
             vtc_name: booking.vtc_name,
             contact_name: booking.contact_name || 'VTC Representative',
             slot_number: booking.slot_number,
-            event_name: event_name || `Event ${booking.event_id}`,
+            event_name: eventDetails.event_name || event_name || `Event ${booking.event_id}`,
+            event_date: eventDetails.event_date,
+            event_time: eventDetails.event_time,
+            event_server: eventDetails.event_server,
+            event_banner: eventDetails.event_banner,
+            meetup_location: eventDetails.meetup_location,
+            destination: eventDetails.destination,
+            departure_city: eventDetails.departure_city,
+            arrival_city: eventDetails.arrival_city,
+            slot_image_url: slotData?.slot_image_url,
+            member_count: booking.member_count,
             status: newStatus,
             reviewer: reviewer || 'Discord Staff',
           }),
