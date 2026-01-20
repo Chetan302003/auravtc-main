@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Settings, Save, Loader2, Users, Truck, Route, Calendar, Eye, UserCheck } from 'lucide-react';
-import VTCStatsPreview from './VTCStatsPreview';
 
 interface VTCSettingsManagementProps {
   isAdmin: boolean;
@@ -82,7 +81,7 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
       toast.error(error.message || 'Failed to save settings');
     } finally {
       setSaving(false);
-    }
+          }
   };
 
   const handleToggleAttendance = async (enabled: boolean) => {
@@ -144,8 +143,6 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
           Manage the statistics displayed on the homepage
         </p>
       </div>
-
-      <div className="p-4 sm:p-6 space-y-6">
         {/* Attendance System Toggle */}
         <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/30 border border-border/30">
           <div className="flex items-center gap-3">
@@ -161,7 +158,7 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
             disabled={togglingAttendance}
           />
         </div>
-
+      <div className="p-4 sm:p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
@@ -212,32 +209,23 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-          <Button 
-            onClick={handleSave} 
-            disabled={saving}
-            className="w-full sm:w-auto"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Settings
-              </>
-            )}
-          </Button>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Eye className="w-3 h-3" />
-            <span>Preview updates in real-time below</span>
-          </div>
-        </div>
-
-        {/* Live Preview */}
-        <VTCStatsPreview settings={settings} />
+        <Button 
+          onClick={handleSave} 
+          disabled={saving}
+          className="w-full sm:w-auto"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4 mr-2" />
+              Save Settings
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );
