@@ -65,9 +65,9 @@ serve(async (req) => {
             event_server: event.server?.name,
             event_banner: event.banner,
             meetup_location: event.meetup?.location,
-            destination: event.destination?.location,
-            departure_city: event.departure?.location,
-            arrival_city: event.arrive?.location,
+            destination: event.arrive?.city || event.destination?.location,
+            departure_city: event.departure?.city || event.departure?.location,
+            arrival_city: event.arrive?.city || event.arrive?.location,
           };
         }
       }
