@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Calendar, MapPin, Clock, Users, Truck, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, Clock, Users, Truck, Loader2, CheckCircle2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import PageTransition from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/button';
@@ -37,10 +37,17 @@ interface Slot {
   };
 }
 
+interface ApprovedBooking {
+  slot_number: number;
+  vtc_name: string;
+  member_count: number;
+}
+
 const EventBooking = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<TruckersMPEvent | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [approvedBookings, setApprovedBookings] = useState<ApprovedBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -90,6 +97,17 @@ const EventBooking = () => {
       if (slotsError) throw slotsError;
       if (bookingsError) throw bookingsError;
 
+      // Extract approved bookings for the list
+      const approved = (bookingsData || [])
+        .filter(b => b.status === 'approved')
+        .map(b => ({
+          slot_number: b.slot_number,
+          vtc_name: b.vtc_name,
+          member_count: b.member_count
+        }))
+        .sort((a, b) => a.slot_number - b.slot_number);
+      
+      setApprovedBookings(approved);
       // Generate default slots if none exist (1-20)
       let processedSlots: Slot[] = [];
       
@@ -328,6 +346,38 @@ const EventBooking = () => {
                       selectedSlot={selectedSlot}
                       eventBanner={event.banner}
                     />
+                        )}
+
+                  {/* VTC Booked List */}
+                  {approvedBookings.length > 0 && (
+                    <div className="mt-8 pt-6 border-t border-border/50">
+                      <div className="flex items-center gap-3 mb-4">
+                        <CheckCircle2 className="w-5 h-5 text-primary" />
+                        <h3 className="font-display text-lg font-semibold">Confirmed VTCs</h3>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">
+                          {approvedBookings.length} booked
+                        </span>
+                      </div>
+                      <div className="grid gap-2">
+                        {approvedBookings.map((booking) => (
+                          <div 
+                            key={booking.slot_number}
+                            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/30"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
+                                #{booking.slot_number}
+                              </div>
+                              <span className="font-medium">{booking.vtc_name}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <Users className="w-3.5 h-3.5" />
+                              <span>{booking.member_count}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
