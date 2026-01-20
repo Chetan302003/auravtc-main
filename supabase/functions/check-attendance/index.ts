@@ -66,24 +66,26 @@ Deno.serve(async (req) => {
     const eventId: string | undefined = body?.eventId;
     const mode: 'attendance' | 'status' = body?.mode === 'status' ? 'status' : 'attendance';
 
-    await log({ level: 'info', source: 'check-attendance', message: 'Request received', data: { runId, mode, eventId: eventId ?? null } });
-
-    // Check if attendance system is enabled (from vtc_settings)
+    // Check if attendance system is enabled (from vtc_settings) FIRST before logging
     const { data: attendanceSetting } = await supabase
       .from('vtc_settings')
       .select('setting_value')
       .eq('setting_key', 'attendance_enabled')
       .maybeSingle();
 
-    const isAttendanceEnabled = attendanceSetting?.setting_value !== 'false';
+    // Explicitly check if the setting value is 'true' (must be enabled, not just "not false")
+    const isAttendanceEnabled = attendanceSetting?.setting_value === 'true';
 
     if (!isAttendanceEnabled) {
-      await log({ level: 'info', source: 'check-attendance', message: 'Attendance system is disabled' });
+      // Only log briefly when disabled - no DB log to reduce noise
+      console.log('[INFO] check-attendance: System disabled, skipping');
       return new Response(
         JSON.stringify({ success: true, message: 'Attendance system is disabled', skipped: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    await log({ level: 'info', source: 'check-attendance', message: 'Request received', data: { runId, mode, eventId: eventId ?? null } });
 
     if (mode === 'attendance' && !eventId) {
       await log({ level: 'error', source: 'check-attendance', message: 'Event ID is required for attendance mode' });
