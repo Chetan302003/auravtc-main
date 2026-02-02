@@ -117,9 +117,18 @@ const Footer = () => {
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} Aura VTC. All rights reserved.
           </p>
-          <p className="text-muted-foreground text-sm flex items-center gap-1">
-            Built by <span className="text-primary font-semibold">AURA</span> <Heart className="w-4 h-4 text-primary fill-primary" />
-          </p>
+<p className="text-muted-foreground text-sm flex items-center gap-1">
+  Built by 
+  <a 
+    href="https://truckersmp.com/user/5936847" // Replace with your actual link
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="text-primary font-semibold hover:underline"
+  >
+    Chetan
+  </a> 
+  <Heart className="w-4 h-4 text-primary fill-primary" />
+</p>
         </div>
       </div>
     </footer>
