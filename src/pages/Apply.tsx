@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const requirements = [
   'Must have a valid TruckersMP account',
@@ -45,8 +46,8 @@ const handleSubmit = async (e: React.FormEvent) => {
       const HR_EDGE_FUNCTION_URL = import.meta.env.VITE_HR_EDGE_FUNCTION_URL;
       
       const payload = {
-        username: "Aura VTC Recruitment Bot",
         action: "submit",
+        username: "Aura VTC Recruitment Bot",
         content: `🚨 New VTC Application for <@&${HR_ROLE_ID}>`,
         embeds: [
           {
@@ -66,7 +67,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         ]
       };
 
-      const response = await fetch(HR_EDGE_FUNCTION_URL, {
+      const response = await supabase.functions.invoke('aura-hr-handler', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -199,7 +200,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         Discord ID
                       </label>
                       <Input
-                        placeholder="e.g., user#1234"
+                        placeholder="e.g., 123456789012345678"
                         value={formData.discordId}
                         onChange={(e) => setFormData({ ...formData, discordId: e.target.value })}
                         required
