@@ -27,18 +27,26 @@ const Apply = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setIsSubmitting(true);
+
+  //   // HR TEAM ROLE ID (Using the ID you provided previously)
+  //   const HR_ROLE_ID = "1431313604216356976"; 
+
+  //   try {
+  //     const DISCORD_WEBHOOK_URL = import.meta.env.VITE_AURA_DISCORD_WEBHOOK;
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // HR TEAM ROLE ID (Using the ID you provided previously)
-    const HR_ROLE_ID = "1431313604216356976"; 
-
     try {
-      const DISCORD_WEBHOOK_URL = import.meta.env.VITE_AURA_DISCORD_WEBHOOK;
-
+      // Your Supabase Edge Function URL
+      const HR_EDGE_FUNCTION_URL = import.meta.env.VITE_HR_EDGE_FUNCTION_URL;
+      
       const payload = {
         username: "Aura VTC Recruitment Bot",
+        action: "submit",
         content: `🚨 New VTC Application for <@&${HR_ROLE_ID}>`,
         embeds: [
           {
@@ -58,14 +66,16 @@ const Apply = () => {
         ]
       };
 
-      const response = await fetch(DISCORD_WEBHOOK_URL, {
+      const response = await fetch(HR_EDGE_FUNCTION_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error('Failed to send application');
-
+      if (!response.ok){
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send application');
+      }
       toast({
         title: 'Application Submitted!',
         description: "We'll review your application and get back to you soon.",
