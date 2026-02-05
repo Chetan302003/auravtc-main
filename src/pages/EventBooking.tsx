@@ -235,7 +235,10 @@ const EventBooking = () => {
       </PageTransition>
     );
   }
-
+const getSlotLabel = (slotNumber: number) => {
+  const slot = slots.find(s => s.slot_number === slotNumber);
+  return slot?.slot_label ?? `Slot #${slotNumber}`;
+};
   return (
     <PageTransition>
       <Layout>
@@ -365,8 +368,8 @@ const EventBooking = () => {
                             className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/30"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
-                                #{booking.slot_number}
+                              <div className="px-2 py-1 rounded-lg bg-primary/20 text-xs font-bold text-primary">
+                                #{getSlotLabel(booking.slot_number)}
                               </div>
                               <span className="font-medium">{booking.vtc_name}</span>
                             </div>
