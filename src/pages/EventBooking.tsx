@@ -369,7 +369,7 @@ const getSlotLabel = (slotNumber: number) => {
                           >
                             <div className="flex items-center gap-3">
                               <div className="px-2 py-1 rounded-lg bg-primary/20 text-xs font-bold text-primary">
-                                #{getSlotLabel(booking.slot_number)}
+                                {getSlotLabel(booking.slot_number)}
                               </div>
                               <span className="font-medium">{booking.vtc_name}</span>
                             </div>
