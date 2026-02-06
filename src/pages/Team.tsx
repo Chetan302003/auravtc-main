@@ -200,11 +200,11 @@ const Team = () => {
                                   <Icon className="w-10 h-10 text-primary group-hover:scale-110 transition-transform" />
                                 </div>
                               )}
-                               {/* /* {member.is_owner && (
-                                <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center animate-bounce-subtle">
-                                  <Crown className="w-3 h-3 text-yellow-900" />
+                               {member.is_owner && (
+                               // <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center animate-bounce-subtle">
+                                 // <Crown className="w-3 h-3 text-yellow-900" />
                                 </div>
-                              )} */ */}
+                              )}
                             </div>
                             <h3 className="w-full font-display text-sm sm:text-lg font-bold text-foreground mb-1 break-words line-clamp-none leading-tight group-hover:text-primary transition-colors">
                               {member.username}
