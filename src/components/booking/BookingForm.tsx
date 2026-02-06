@@ -35,11 +35,14 @@ type BookingFormData = z.infer<typeof bookingSchema>;
 interface BookingFormProps {
   eventId: string;
   slotNumber: number;
+  eventName?: string;
+  eventSlug?: string;
+  eventBanner?: string;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-const BookingForm = ({ eventId, slotNumber, onSuccess, onCancel }: BookingFormProps) => {
+const BookingForm = ({ eventId, slotNumber, eventName, eventSlug, eventBanner, onSuccess, onCancel }: BookingFormProps) => {
   const [submitting, setSubmitting] = useState(false);
 
   const {
@@ -82,6 +85,9 @@ const BookingForm = ({ eventId, slotNumber, onSuccess, onCancel }: BookingFormPr
           booking_id: booking.id,
           event_id: eventId,
           slot_number: slotNumber,
+          event_name: eventName,
+          event_slug: eventSlug,
+          event_banner: eventBanner,
           vtc_name: data.vtc_name,
           discord_id: data.discord_id,
           contact_email: data.contact_email,
