@@ -69,6 +69,16 @@ const Events = () => {
     return () => clearInterval(interval);
   }, []);
 
+    // TruckersMP API returns times in UTC (format: "YYYY-MM-DD HH:mm:ss")
+  // We need to append 'Z' to ensure JavaScript parses it as UTC
+  const parseEventTime = (dateString: string) => {
+    // If the string doesn't have timezone info, treat it as UTC
+    if (!dateString.includes('Z') && !dateString.includes('+') && !dateString.includes('T')) {
+      return new Date(dateString.replace(' ', 'T') + 'Z');
+    }
+    return new Date(dateString);
+  };
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -79,14 +89,24 @@ const Events = () => {
     });
   };
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatLocalTime = (dateString: string) => {
+    const date = parseEventTime(dateString);
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      timeZoneName: 'short',
+     // timeZoneName: 'short',
     });
   };
+
+    const formatUTCTime = (dateString: string) => {
+    const date = parseEventTime(dateString);
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'UTC',
+    }) + ' UTC';
+  };
+
 
   return (
     <PageTransition>
@@ -165,7 +185,7 @@ const Events = () => {
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Clock className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span>{formatTime(event.start_at)}</span>
+                        <span className="truncate">Departure: {formatLocalTime(event.start_at)} ({formatUTCTime(event.start_at)})</span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
@@ -250,7 +270,7 @@ const Events = () => {
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Clock className="w-4 h-4 text-primary shrink-0" />
-                        <span>{formatTime(event.start_at)}</span>
+                        <span className="truncate">Departure: {formatLocalTime(event.start_at)} ({formatUTCTime(event.start_at)})</span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <MapPin className="w-4 h-4 text-primary shrink-0" />
