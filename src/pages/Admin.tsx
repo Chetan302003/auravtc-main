@@ -27,6 +27,7 @@ import SlotManagement from '@/components/admin/SlotManagement';
 import GalleryManagement from '@/components/admin/GalleryManagement';
 import VTCSettingsManagement from '@/components/admin/VTCSettingsManagement';
 import UserManagement from '@/components/admin/UserManagement';
+import ApplicationsManagement from '@/components/admin/ApplicationsManagement';
 interface Member {
   id: string;
   tmp_id: number;
@@ -614,7 +615,18 @@ const Admin = () => {
           >
             <UserManagement isAdmin={isAdmin} />
           </motion.div>
-
+          
+          {/* Applications Management - Visible to Admin and HR role */}
+          
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.795 }}
+              className="mt-6"
+            >
+              <ApplicationsManagement isAdmin={isAdmin || hasRole('hr')} />
+            </motion.div>
+           
           {/* System Logs - Full Width */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
