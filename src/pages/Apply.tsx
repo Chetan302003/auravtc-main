@@ -28,69 +28,120 @@ const Apply = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
-    setIsSubmitting(true);
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    // HR TEAM ROLE ID (Using the ID you provided previously)
-    const HR_ROLE_ID = "1431313604216356976"; 
+  try {
+    const { error } = await supabase.functions.invoke(
+      "aura-hr-handler",
+      {
+        body: {
+          action: "submit",
+          name: formData.name,
+          truckermp_id: formData.truckersMPId,
+          discord_id: formData.discordId,
+          age: formData.age,
+          experience: formData.experience,
+          reason: formData.reason,
+        },
+      }
+    );
 
-    try {
-      const DISCORD_WEBHOOK_URL = import.meta.env.VITE_AURA_DISCORD_WEBHOOK;
-
-
-      const payload = {
-        username: "Aura VTC Recruitment Bot",
-
-        content: `🚨 New VTC Application for <@&${HR_ROLE_ID}>`,
-        embeds: [
-          {
-                        title: `🚛 New Application: ${formData.name}`,
-            color: 3066993, // Aura Green
-            fields: [
-              { name: "👤 Name", value: formData.name, inline: true },
-              { name: "🆔 TruckersMP ID", value: formData.truckersMPId, inline: true },
-              { name: "🎮 Discord ID", value: formData.discordId, inline: true },
-              { name: "🎂 Age", value: formData.age, inline: true },
-              { name: "🛠️ Experience", value: formData.experience, inline: false },
-              { name: "💡 Motivation", value: formData.reason, inline: false },
-            ],
-            timestamp: new Date().toISOString(),
-            footer: { text: "Aura VTC Recruitment System" }
-          }
-        ]
-      };
-
-      const response = await fetch(DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) throw new Error('Failed to send application');
-      toast({
-        title: 'Application Submitted!',
-        description: "We'll review your application and get back to you soon.",
-      });
-
-      setFormData({
-        name: '',
-        truckersMPId: '',
-        discordId: '',
-        age: '',
-        experience: '',
-        reason: '',
-      });
-
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: "Something went wrong. Please try again later.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
+    if (error) {
+      console.error("Edge function error:", error);
+      throw new Error("Submission failed");
     }
-  };;
+
+    toast({
+      title: "Application Submitted!",
+      description: "Our HR team will review your application soon.",
+    });
+
+    setFormData({
+      name: "",
+      truckersMPId: "",
+      discordId: "",
+      age: "",
+      experience: "",
+      reason: "",
+    });
+
+  } catch (err) {
+    toast({
+      title: "Error",
+      description: "Something went wrong. Please try again later.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
+ //  const handleSubmit = async (e: React.FormEvent) => {
+ // e.preventDefault();
+ //    setIsSubmitting(true);
+
+ //    // HR TEAM ROLE ID (Using the ID you provided previously)
+ //    const HR_ROLE_ID = "1431313604216356976"; 
+
+ //    try {
+ //      const DISCORD_WEBHOOK_URL = import.meta.env.VITE_AURA_DISCORD_WEBHOOK;
+
+
+ //      const payload = {
+ //        username: "Aura VTC Recruitment Bot",
+
+ //        content: `🚨 New VTC Application for <@&${HR_ROLE_ID}>`,
+ //        embeds: [
+ //          {
+ //                        title: `🚛 New Application: ${formData.name}`,
+ //            color: 3066993, // Aura Green
+ //            fields: [
+ //              { name: "👤 Name", value: formData.name, inline: true },
+ //              { name: "🆔 TruckersMP ID", value: formData.truckersMPId, inline: true },
+ //              { name: "🎮 Discord ID", value: formData.discordId, inline: true },
+ //              { name: "🎂 Age", value: formData.age, inline: true },
+ //              { name: "🛠️ Experience", value: formData.experience, inline: false },
+ //              { name: "💡 Motivation", value: formData.reason, inline: false },
+ //            ],
+ //            timestamp: new Date().toISOString(),
+ //            footer: { text: "Aura VTC Recruitment System" }
+ //          }
+ //        ]
+ //      };
+
+ //      const response = await fetch(DISCORD_WEBHOOK_URL, {
+ //        method: 'POST',
+ //        headers: { 'Content-Type': 'application/json' },
+ //        body: JSON.stringify(payload),
+ //      });
+
+ //      if (!response.ok) throw new Error('Failed to send application');
+ //      toast({
+ //        title: 'Application Submitted!',
+ //        description: "We'll review your application and get back to you soon.",
+ //      });
+
+ //      setFormData({
+ //        name: '',
+ //        truckersMPId: '',
+ //        discordId: '',
+ //        age: '',
+ //        experience: '',
+ //        reason: '',
+ //      });
+
+ //    } catch (error) {
+ //      toast({
+ //        title: 'Error',
+ //        description: "Something went wrong. Please try again later.",
+ //        variant: "destructive"
+ //      });
+ //    } finally {
+ //      setIsSubmitting(false);
+ //    }
+ //  };;
 
   return (
     <PageTransition>
