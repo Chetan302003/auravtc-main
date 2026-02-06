@@ -624,7 +624,7 @@ const Admin = () => {
               transition={{ duration: 0.5, delay: 0.795 }}
               className="mt-6"
             >
-              <ApplicationsManagement isAdmin={isAdmin || hasRole('hr')} />
+              <ApplicationsManagement isAdmin={isAdmin} />
             </motion.div>
            
           {/* System Logs - Full Width */}
