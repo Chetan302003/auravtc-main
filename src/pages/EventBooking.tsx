@@ -400,6 +400,9 @@ const getSlotLabel = (slotNumber: number) => {
                     <BookingForm 
                       eventId={eventId!}
                       slotNumber={selectedSlot}
+                      eventName={event.name}
+                      eventSlug={event.slug}
+                      eventBanner={event.banner || undefined}
                       onSuccess={handleBookingSuccess}
                       onCancel={() => {
                         setShowForm(false);
