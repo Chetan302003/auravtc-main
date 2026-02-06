@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { RefreshCw, Trash2, ChevronDown, ChevronRight, AlertCircle, Info, AlertTriangle, Loader2, Database } from 'lucide-react';
+import { RefreshCw, Trash2, ChevronDown, ChevronRight, AlertCircle, Info, AlertTriangle, Loader2, Database, Plus, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SystemLog {
@@ -15,6 +15,7 @@ interface SystemLog {
   run_id: string | null;
   event_id: string | null;
   member_id: string | null;
+  user_id: string | null;
 }
 
 interface GroupedLog {
@@ -32,6 +33,14 @@ interface GroupedLog {
   };
 }
 
+interface AuditData {
+  action: 'INSERT' | 'UPDATE' | 'DELETE';
+  table_name: string;
+  record_id: string;
+  old_data: Record<string, unknown> | null;
+  new_data: Record<string, unknown> | null;
+  changed_at: string;
+}
 interface SystemLogsProps {
   isAdmin: boolean;
 }
@@ -42,6 +51,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<'all' | 'info' | 'warn' | 'error'>('all');
   const [sourceFilter, setSourceFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'audit' | 'system'>('all');
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -77,12 +87,109 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
     const uniqueSources = [...new Set(logs.map(l => l.source))];
     return uniqueSources.sort();
   }, [logs]);
+  // Check if a log is an audit log
+  const isAuditLog = (log: SystemLog): boolean => {
+    return log.source.startsWith('audit-');
+  };
+  // Get audit data from log
+  const getAuditData = (log: SystemLog): AuditData | null => {
+    if (!isAuditLog(log) || !log.data) return null;
+    return log.data as unknown as AuditData;
+  };
+  // Get action icon
+  const getActionIcon = (action: string) => {
+    switch (action) {
+      case 'INSERT':
+        return <Plus className="w-3 h-3" />;
+      case 'UPDATE':
+        return <Pencil className="w-3 h-3" />;
+      case 'DELETE':
+        return <X className="w-3 h-3" />;
+      default:
+        return null;
+    }
+  };
+  // Get action color
+  const getActionColor = (action: string) => {
+    switch (action) {
+      case 'INSERT':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'UPDATE':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'DELETE':
+        return 'bg-red-500/20 text-red-400 border-red-500/30';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
+  // Get table display name
+  const getTableDisplayName = (tableName: string) => {
+    const names: Record<string, string> = {
+      applications: 'Application',
+      events: 'Event',
+      gallery_items: 'Gallery Item',
+      slot_bookings: 'Slot Booking',
+      event_slots: 'Event Slot',
+      members: 'Member',
+      vtc_settings: 'VTC Setting',
+      user_roles: 'User Role',
+      profiles: 'Profile',
+      attendance: 'Attendance',
+      event_booking_settings: 'Booking Settings',
+    };
+    return names[tableName] || tableName;
+  };
+  // Calculate diff between old and new data
+  const calculateDiff = (oldData: Record<string, unknown> | null, newData: Record<string, unknown> | null) => {
+    const changes: { field: string; oldValue: unknown; newValue: unknown }[] = [];
+    
+    if (!oldData && newData) {
+      // INSERT - show all new fields
+      Object.entries(newData).forEach(([key, value]) => {
+        if (key !== 'id' && key !== 'created_at' && key !== 'updated_at') {
+          changes.push({ field: key, oldValue: null, newValue: value });
+        }
+      });
+    } else if (oldData && !newData) {
+      // DELETE - show all old fields
+      Object.entries(oldData).forEach(([key, value]) => {
+        if (key !== 'id' && key !== 'created_at' && key !== 'updated_at') {
+          changes.push({ field: key, oldValue: value, newValue: null });
+        }
+      });
+    } else if (oldData && newData) {
+      // UPDATE - show changed fields
+      Object.keys({ ...oldData, ...newData }).forEach((key) => {
+        if (key !== 'updated_at' && JSON.stringify(oldData[key]) !== JSON.stringify(newData[key])) {
+          changes.push({ field: key, oldValue: oldData[key], newValue: newData[key] });
+        }
+      });
+    }
+    
+    return changes;
+  };
+  // Format value for display
+  const formatValue = (value: unknown): string => {
+    if (value === null || value === undefined) return 'null';
+    if (typeof value === 'object') return JSON.stringify(value);
+    return String(value);
+  };
 
   // Group attendance logs by run_id and consolidate
   const processedLogs = useMemo(() => {
-    const filteredLogs = sourceFilter === 'all' 
-      ? logs 
-      : logs.filter(l => l.source === sourceFilter);
+    let filteredLogs = logs;
+    
+    // Apply category filter
+    if (categoryFilter === 'audit') {
+      filteredLogs = filteredLogs.filter(l => l.source.startsWith('audit-'));
+    } else if (categoryFilter === 'system') {
+      filteredLogs = filteredLogs.filter(l => !l.source.startsWith('audit-'));
+    }
+    
+    // Apply source filter
+    if (sourceFilter !== 'all') {
+      filteredLogs = filteredLogs.filter(l => l.source === sourceFilter);
+    }
 
     // Group logs by run_id for attendance checks
     const runGroups = new Map<string, SystemLog[]>();
@@ -108,7 +215,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
       // Find summary log or create one
       const summaryLog = logsInRun.find(l => l.message.includes('completed') || l.message.includes('Attendance check'));
       const firstLog = logsInRun[0];
-      const lastLog = logsInRun[logsInRun.length - 1];
+      //const lastLog = logsInRun[logsInRun.length - 1];
 
       // Count online/offline from individual checks
       let online = 0;
@@ -150,7 +257,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
     ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     return allItems;
-  }, [logs, sourceFilter]);
+  }, [logs, sourceFilter, categoryFilter]);
 
   const handleClearLogs = async () => {
     if (!isAdmin) {
@@ -216,7 +323,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
   const isGroupedLog = (item: GroupedLog | SystemLog): item is GroupedLog => {
     return 'logs' in item && Array.isArray(item.logs);
   };
-
+ 
   return (
     <div className="glass-card rounded-lg sm:rounded-xl border border-primary/20 overflow-hidden">
       <div className="p-4 sm:p-6 border-b border-border/30">
