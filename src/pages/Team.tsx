@@ -201,8 +201,8 @@ const Team = () => {
                                 </div>
                               )}
                                {member.is_owner && (
-                               // <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center animate-bounce-subtle">
-                                 // <Crown className="w-3 h-3 text-yellow-900" />
+                                 <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center animate-bounce-subtle">
+                                 <Crown className="w-3 h-3 text-yellow-900" />
                                 </div>
                               )}
                             </div>
