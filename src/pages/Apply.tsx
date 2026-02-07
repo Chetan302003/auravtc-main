@@ -517,7 +517,7 @@ export default Apply;
 //       </section>
 //     </Layout>
 //     </PageTransition>
-  );
-};
+//   );
+// };
 
-export default Apply;
+// export default Apply;
