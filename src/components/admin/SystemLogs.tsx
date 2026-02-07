@@ -2,7 +2,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { RefreshCw, Trash2, ChevronDown, ChevronRight, AlertCircle, Info, AlertTriangle, Loader2, Database, Plus, Pencil, X } from 'lucide-react';
+import { RefreshCw, Trash2, ChevronDown, ChevronRight, AlertCircle, Info, AlertTriangle, Loader2, Database, Plus, Pencil, X, Download, FileJson, FileSpreadsheet } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 
 interface SystemLog {
@@ -41,6 +47,7 @@ interface AuditData {
   new_data: Record<string, unknown> | null;
   changed_at: string;
 }
+
 interface SystemLogsProps {
   isAdmin: boolean;
 }
@@ -87,15 +94,18 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
     const uniqueSources = [...new Set(logs.map(l => l.source))];
     return uniqueSources.sort();
   }, [logs]);
+
   // Check if a log is an audit log
   const isAuditLog = (log: SystemLog): boolean => {
     return log.source.startsWith('audit-');
   };
+
   // Get audit data from log
   const getAuditData = (log: SystemLog): AuditData | null => {
     if (!isAuditLog(log) || !log.data) return null;
     return log.data as unknown as AuditData;
   };
+
   // Get action icon
   const getActionIcon = (action: string) => {
     switch (action) {
@@ -109,6 +119,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         return null;
     }
   };
+
   // Get action color
   const getActionColor = (action: string) => {
     switch (action) {
@@ -122,6 +133,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         return 'bg-muted text-muted-foreground';
     }
   };
+
   // Get table display name
   const getTableDisplayName = (tableName: string) => {
     const names: Record<string, string> = {
@@ -139,6 +151,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
     };
     return names[tableName] || tableName;
   };
+
   // Calculate diff between old and new data
   const calculateDiff = (oldData: Record<string, unknown> | null, newData: Record<string, unknown> | null) => {
     const changes: { field: string; oldValue: unknown; newValue: unknown }[] = [];
@@ -168,6 +181,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
     
     return changes;
   };
+
   // Format value for display
   const formatValue = (value: unknown): string => {
     if (value === null || value === undefined) return 'null';
@@ -215,7 +229,6 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
       // Find summary log or create one
       const summaryLog = logsInRun.find(l => l.message.includes('completed') || l.message.includes('Attendance check'));
       const firstLog = logsInRun[0];
-      //const lastLog = logsInRun[logsInRun.length - 1];
 
       // Count online/offline from individual checks
       let online = 0;
@@ -293,6 +306,108 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
     });
   };
 
+  // Export logs to JSON
+  const exportToJSON = () => {
+    const dataToExport = processedLogs.map(item => {
+      if (isGroupedLog(item)) {
+        return {
+          type: 'grouped',
+          id: item.id,
+          run_id: item.run_id,
+          source: item.source,
+          level: item.level,
+          created_at: item.created_at,
+          summary: item.summary,
+          stats: item.stats,
+          logs: item.logs
+        };
+      } else {
+        const log = item as SystemLog;
+        return {
+          type: isAuditLog(log) ? 'audit' : 'system',
+          id: log.id,
+          created_at: log.created_at,
+          level: log.level,
+          source: log.source,
+          message: log.message,
+          data: log.data,
+          user_id: log.user_id
+        };
+      }
+    });
+
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `system-logs-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Logs exported as JSON');
+  };
+
+  // Export logs to CSV
+  const exportToCSV = () => {
+    const headers = ['Timestamp', 'Level', 'Source', 'Type', 'Action', 'Table', 'Message', 'Record ID', 'User ID', 'Data'];
+    
+    const rows = processedLogs.map(item => {
+      if (isGroupedLog(item)) {
+        return [
+          item.created_at,
+          item.level,
+          item.source,
+          'grouped',
+          '',
+          '',
+          item.summary,
+          item.run_id,
+          '',
+          JSON.stringify(item.stats || {})
+        ];
+      } else {
+        const log = item as SystemLog;
+        const auditData = getAuditData(log);
+        return [
+          log.created_at,
+          log.level,
+          log.source,
+          isAuditLog(log) ? 'audit' : 'system',
+          auditData?.action || '',
+          auditData?.table_name || '',
+          log.message,
+          auditData?.record_id || log.id,
+          log.user_id || '',
+          JSON.stringify(log.data || {})
+        ];
+      }
+    });
+
+    const escapeCSV = (value: string) => {
+      if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+        return `"${value.replace(/"/g, '""')}"`;
+      }
+      return value;
+    };
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => escapeCSV(String(cell ?? ''))).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `system-logs-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Logs exported as CSV');
+  };
+
   const getLevelIcon = (level: string) => {
     switch (level) {
       case 'error':
@@ -323,7 +438,107 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
   const isGroupedLog = (item: GroupedLog | SystemLog): item is GroupedLog => {
     return 'logs' in item && Array.isArray(item.logs);
   };
- 
+
+  // Render audit log entry
+  const renderAuditLog = (log: SystemLog) => {
+    const auditData = getAuditData(log);
+    if (!auditData) return null;
+
+    const diff = calculateDiff(auditData.old_data, auditData.new_data);
+
+    return (
+      <div
+        key={log.id}
+        className={`rounded-lg border p-2 sm:p-3 transition-all ${getLevelColor(log.level)}`}
+      >
+        <div 
+          className="flex items-start gap-2 cursor-pointer"
+          onClick={() => toggleExpand(log.id)}
+        >
+          {expandedLogs.has(log.id) ? (
+            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+          ) : (
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+          )}
+          
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+              <span className="text-[10px] sm:text-xs text-muted-foreground">
+                {formatTime(log.created_at)}
+              </span>
+              
+              {/* Action badge */}
+              <span className={`text-[10px] sm:text-xs px-1.5 py-0.5 rounded border flex items-center gap-1 ${getActionColor(auditData.action)}`}>
+                {getActionIcon(auditData.action)}
+                {auditData.action}
+              </span>
+              
+              {/* Table name badge */}
+              <span className="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-secondary/50 text-muted-foreground">
+                {getTableDisplayName(auditData.table_name)}
+              </span>
+            </div>
+            
+            <p className="text-xs sm:text-sm text-foreground break-words">
+              {auditData.action === 'INSERT' && `New ${getTableDisplayName(auditData.table_name).toLowerCase()} created`}
+              {auditData.action === 'UPDATE' && `${getTableDisplayName(auditData.table_name)} updated`}
+              {auditData.action === 'DELETE' && `${getTableDisplayName(auditData.table_name)} deleted`}
+              {diff.length > 0 && auditData.action === 'UPDATE' && (
+                <span className="text-muted-foreground ml-1">
+                  ({diff.length} field{diff.length !== 1 ? 's' : ''} changed)
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Expanded diff view */}
+        {expandedLogs.has(log.id) && (
+          <div className="mt-2 ml-6 sm:ml-8 space-y-1.5">
+            {diff.length > 0 ? (
+              <div className="space-y-1">
+                {diff.map((change, idx) => (
+                  <div key={idx} className="p-2 rounded bg-background/50 border border-border/30">
+                    <span className="text-[10px] sm:text-xs font-medium text-foreground capitalize">
+                      {change.field.replace(/_/g, ' ')}
+                    </span>
+                    <div className="mt-1 space-y-0.5">
+                      {change.oldValue !== null && (
+                        <div className="flex items-start gap-1">
+                          <span className="text-[10px] text-red-400 flex-shrink-0">−</span>
+                          <span className="text-[10px] sm:text-xs text-red-400 break-all">
+                            {formatValue(change.oldValue)}
+                          </span>
+                        </div>
+                      )}
+                      {change.newValue !== null && (
+                        <div className="flex items-start gap-1">
+                          <span className="text-[10px] text-green-400 flex-shrink-0">+</span>
+                          <span className="text-[10px] sm:text-xs text-green-400 break-all">
+                            {formatValue(change.newValue)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-2 rounded bg-background/50 border border-border/30">
+                <span className="text-[10px] sm:text-xs text-muted-foreground">No field changes to display</span>
+              </div>
+            )}
+            
+            {/* Record ID */}
+            <div className="text-[9px] sm:text-[10px] text-muted-foreground mt-2">
+              Record ID: {auditData.record_id}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="glass-card rounded-lg sm:rounded-xl border border-primary/20 overflow-hidden">
       <div className="p-4 sm:p-6 border-b border-border/30">
@@ -334,6 +549,23 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
           </h2>
           
           <div className="flex flex-wrap items-center gap-2">
+            {/* Category filter */}
+            <div className="flex rounded-lg border border-border/30 overflow-hidden">
+              {(['all', 'audit', 'system'] as const).map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategoryFilter(cat)}
+                  className={`px-2 py-1 text-[10px] sm:text-xs font-medium capitalize transition-colors ${
+                    categoryFilter === cat 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
+                  }`}
+                >
+                  {cat === 'audit' ? 'Changes' : cat}
+                </button>
+              ))}
+            </div>
+
             {/* Source filter */}
             <select
               value={sourceFilter}
@@ -374,6 +606,31 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
               Refresh
             </Button>
 
+            {/* Export dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={processedLogs.length === 0}
+                  className="text-[10px] sm:text-xs"
+                >
+                  <Download className="w-3 h-3 mr-1" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-background border-border">
+                <DropdownMenuItem onClick={exportToJSON} className="cursor-pointer">
+                  <FileJson className="w-4 h-4 mr-2" />
+                  Export as JSON
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={exportToCSV} className="cursor-pointer">
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {isAdmin && (
               <Button
                 size="sm"
@@ -402,6 +659,11 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         ) : (
           <div className="p-2 sm:p-3 space-y-1.5 sm:space-y-2">
             {processedLogs.map((item) => {
+              // Check if it's an audit log
+              if (!isGroupedLog(item) && isAuditLog(item as SystemLog)) {
+                return renderAuditLog(item as SystemLog);
+              }
+              
               if (isGroupedLog(item)) {
                 // Grouped attendance log
                 return (
@@ -513,6 +775,11 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         )}
       </ScrollArea>
     </div>
+  );
+};
+
+export default SystemLogs;
+
   );
 };
 
