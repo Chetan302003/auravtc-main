@@ -124,7 +124,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
     setActionLoading(`accept-${application.id}`);
     try {
       // Call the edge function to handle Discord notification
-      const { error: fnError } = await supabase.functions.invoke('hr-application-webhook', {
+      const { error: fnError } = await supabase.functions.invoke('aura-hr-handler', {
         body: {
           action: 'accept',
           application_id: application.id,
@@ -164,7 +164,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
     setActionLoading(`reject-${selectedApplication.id}`);
     try {
       // Call the edge function to handle Discord notification
-      const { error: fnError } = await supabase.functions.invoke('hr-application-webhook', {
+      const { error: fnError } = await supabase.functions.invoke('aura-hr-handler', {
         body: {
           action: 'reject',
           application_id: selectedApplication.id,
