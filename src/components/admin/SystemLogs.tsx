@@ -779,8 +779,3 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
 };
 
 export default SystemLogs;
-
-  );
-};
-
-export default SystemLogs;
