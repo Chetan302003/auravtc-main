@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Mail, MessageCircle, Send, Clock, ChevronDown } from 'lucide-react';
+import { Mail, MessageCircle, Send, Clock, ChevronDown, CheckCircle2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import PageTransition from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select,SelectContent,SelectItem,SelectTrigger,SelectValue,} from "@/components/ui/select";
 
 
@@ -44,10 +45,12 @@ const Contact = () => {
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDiscordDialog, setShowDiscordDialog] = useState(false);
 
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+  setShowDiscordDialog(true);
 const roleMap: Record<string, string> = {
     "HR TEAM": "1431313604216356976", 
     "Event Team": "1431313604384395446",
@@ -314,6 +317,35 @@ className={`flex h-11 w-full rounded-md transition-all duration-300 outline-none
             </div>
           </div>
         </section>
+              <Dialog open={showDiscordDialog} onOpenChange={setShowDiscordDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl flex items-center gap-2">
+              <CheckCircle2 className="w-6 h-6 text-primary" />
+              Message Sent!
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground pt-2">
+              <p>Your message has been received. Please join our Discord server for faster responses and follow-ups.</p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 pt-2">
+            <a
+              href="https://discord.gg/auravtc"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full"
+            >
+              <Button variant="glow" className="w-full">
+                <MessageCircle className="w-5 h-5" />
+                Join Discord Server
+              </Button>
+            </a>
+            <Button variant="outline" onClick={() => setShowDiscordDialog(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       </Layout>
     </PageTransition>
   );
