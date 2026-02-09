@@ -330,7 +330,7 @@ className={`flex h-11 w-full rounded-md transition-all duration-300 outline-none
           </DialogHeader>
           <div className="flex flex-col gap-3 pt-2">
             <a
-              href="https://discord.gg/auravtc"
+              href="https://discord.gg/f4tmSvcABx"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full"
