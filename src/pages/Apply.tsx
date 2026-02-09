@@ -45,9 +45,6 @@ const handleSubmit = async (e: React.FormEvent) => {
 const { error } = await supabase.functions.invoke(
   "aura-hr-handler",
   {
-    headers: {
-      "x-test-bypass": "true", 
-    },
     body: {
       action: "apply",
       name: formData.name,
