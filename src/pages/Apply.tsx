@@ -188,12 +188,15 @@ const { error } = await supabase.functions.invoke(
                         Discord ID
                       </label>
                       <Input
-                        placeholder="e.g., 123456789012345678"
+                        placeholder="e.g. 123456789012345678"
                         value={formData.discordId}
                         onChange={(e) => setFormData({ ...formData, discordId: e.target.value })}
                         required
                         className="bg-secondary border-border focus:border-primary"
                       />
+                      <p className="mt-1 text-xs text-muted-foreground">
+                             Enable Developer Mode in Discord, right-click your profile → Copy User ID
+                      </p>
                     </div>
                   </div>
 
@@ -271,7 +274,7 @@ const { error } = await supabase.functions.invoke(
           </DialogHeader>
           <div className="flex flex-col gap-3 pt-2">
             <a
-              href="https://discord.gg/auravtc"
+              href="https://discord.gg/f4tmSvcABx"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full"
