@@ -109,6 +109,7 @@ const roleMap: Record<string, string> = {
       });
     } finally {
       setIsSubmitting(false);
+      setShowDiscordDialog(true);
     }
   };
 
@@ -317,7 +318,7 @@ className={`flex h-11 w-full rounded-md transition-all duration-300 outline-none
             </div>
           </div>
         </section>
-              <Dialog open={showDiscordDialog} onOpenChange={setShowDiscordDialog}>
+        <Dialog open={showDiscordDialog} onOpenChange={setShowDiscordDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-xl flex items-center gap-2">
