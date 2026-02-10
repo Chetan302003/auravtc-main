@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Settings, Save, Loader2, Users, Truck, Route, Calendar, Eye, UserCheck } from 'lucide-react';
+import VTCStatsPreview from './VTCStatsPreview';
 
 interface VTCSettingsManagementProps {
   isAdmin: boolean;
@@ -226,6 +227,13 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
             </>
           )}
         </Button>
+       <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Eye className="w-3 h-3" />
+        <span>Preview updates in real-time below</span>
+         </div>
+        </div>
+        {/* Live Preview */}
+        <VTCStatsPreview settings={settings} />
       </div>
     </div>
   );
