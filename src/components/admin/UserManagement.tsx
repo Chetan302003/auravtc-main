@@ -268,6 +268,25 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
       setActionLoading(null);
     }
   };
+  const handleDeleteUser = async (userId: string) => {
+    setActionLoading(`delete-${userId}`);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'delete',
+          user_id: userId,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success('User deleted permanently');
+      setUsers(prev => prev.filter(u => u.id !== userId));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete user');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const handleAddRole = async (userId: string, role: AppRole) => {
     setActionLoading(`add-${userId}`);
@@ -567,6 +586,35 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
                         Deactivate User
                       </DropdownMenuItem>
                     )}
+                                        <DropdownMenuSeparator />
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <DropdownMenuItem 
+                          onSelect={(e) => e.preventDefault()}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete User
+                        </DropdownMenuItem>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete User Permanently?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete this user account, their profile, and all assigned roles. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete Permanently
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
