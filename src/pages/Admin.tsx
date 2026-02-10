@@ -92,7 +92,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth');
+      navigate('/auth'); , { replace: true });
     }
   }, [user, loading, navigate]);
 
