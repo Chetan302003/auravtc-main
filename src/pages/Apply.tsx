@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const requirements = [
   'Must have a valid TruckersMP account',
@@ -27,6 +28,7 @@ const Apply = () => {
     reason: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDiscordDialog, setShowDiscordDialog] = useState(false);
 
   // const handleSubmit = async (e: React.FormEvent) => {
   //   e.preventDefault();
@@ -84,6 +86,7 @@ const { error } = await supabase.functions.invoke(
     });
   } finally {
     setIsSubmitting(false);
+    setShowDiscordDialog(true);
   }
 };
 
@@ -250,6 +253,40 @@ const { error } = await supabase.functions.invoke(
           </div>
         </div>
       </section>
+            <Dialog open={showDiscordDialog} onOpenChange={setShowDiscordDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl flex items-center gap-2">
+              <CheckCircle2 className="w-6 h-6 text-primary" />
+              Application Submitted!
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground pt-2 space-y-3">
+              <p>Your application has been received and is under review.</p>
+              <p className="font-medium text-foreground">Please join our Discord server for the further process:</p>
+              <ul className="text-sm space-y-1 list-disc list-inside">
+                <li>If <span className="text-primary font-semibold">accepted</span>, you will be added to a ticket on the server.</li>
+                <li>If <span className="text-destructive font-semibold">rejected</span>, a reason will be sent to your Discord DMs.</li>
+              </ul>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 pt-2">
+            <a
+              href="https://discord.gg/auravtc"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full"
+            >
+              <Button variant="glow" className="w-full">
+                <MessageSquare className="w-5 h-5" />
+                Join Discord Server
+              </Button>
+            </a>
+            <Button variant="outline" onClick={() => setShowDiscordDialog(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
     </PageTransition>
   );
