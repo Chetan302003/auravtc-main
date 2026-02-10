@@ -233,6 +233,7 @@ const VTCSettingsManagement = ({ isAdmin }: VTCSettingsManagementProps) => {
          </div>
         </div>
         {/* Live Preview */}
+        <div className="border-t border-border/30 p-4 sm:p-6">
         <VTCStatsPreview settings={settings} />
       </div>
     </div>
