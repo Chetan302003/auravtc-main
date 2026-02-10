@@ -28,6 +28,8 @@ import GalleryManagement from '@/components/admin/GalleryManagement';
 import VTCSettingsManagement from '@/components/admin/VTCSettingsManagement';
 import UserManagement from '@/components/admin/UserManagement';
 import ApplicationsManagement from '@/components/admin/ApplicationsManagement';
+import DashboardAnalytics from '@/components/admin/DashboardAnalytics';
+
 interface Member {
   id: string;
   tmp_id: number;
@@ -575,6 +577,17 @@ const Admin = () => {
               </motion.div>
             </div>
           </div>
+
+         {/* Dashboard Analytics - Visible to all authenticated users */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.71 }}
+            className="mt-6"
+          >
+            <DashboardAnalytics isAdmin={isAdmin} />
+          </motion.div>
+
           
           {/* VTC Settings Management - Full Width */}
           <motion.div
