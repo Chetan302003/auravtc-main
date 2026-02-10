@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import VTCStatsPreview from '@/components/admin/VTCStatsPreview';
 import { toast } from 'sonner';
 import { Settings, Save, Loader2, Users, Truck, Route, Calendar, Eye, UserCheck } from 'lucide-react';
-import VTCStatsPreview from './VTCStatsPreview';
+
 
 interface VTCSettingsManagementProps {
   isAdmin: boolean;
