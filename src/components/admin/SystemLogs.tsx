@@ -207,6 +207,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
 
     // Group logs by run_id for attendance checks
     const runGroups = new Map<string, SystemLog[]>();
+    const auditLogs: SystemLog[] = [];
     const otherLogs: SystemLog[] = [];
 
     filteredLogs.forEach(log => {
@@ -214,10 +215,52 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         const existing = runGroups.get(log.run_id) || [];
         existing.push(log);
         runGroups.set(log.run_id, existing);
+      } else if (log.source.startsWith('audit-')) {
+        auditLogs.push(log);
       } else {
         otherLogs.push(log);
       }
     });
+
+    // Group audit logs by table + user within a 5-second window
+    const auditGroups: SystemLog[][] = [];
+    const usedAuditIndices = new Set<number>();
+    
+    // Sort audit logs by time
+    const sortedAudit = [...auditLogs].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    
+    for (let i = 0; i < sortedAudit.length; i++) {
+      if (usedAuditIndices.has(i)) continue;
+      const log = sortedAudit[i];
+      const auditData = getAuditData(log);
+      if (!auditData) {
+        otherLogs.push(log);
+        continue;
+      }
+      
+      const group: SystemLog[] = [log];
+      usedAuditIndices.add(i);
+      const baseTime = new Date(log.created_at).getTime();
+      
+      for (let j = i + 1; j < sortedAudit.length; j++) {
+        if (usedAuditIndices.has(j)) continue;
+        const other = sortedAudit[j];
+        const otherAudit = getAuditData(other);
+        if (!otherAudit) continue;
+        
+        const timeDiff = Math.abs(new Date(other.created_at).getTime() - baseTime);
+        if (timeDiff > 5000) break; // beyond 5s window
+        
+        if (otherAudit.table_name === auditData.table_name && 
+            other.user_id === log.user_id &&
+            otherAudit.action === auditData.action) {
+          group.push(other);
+          usedAuditIndices.add(j);
+        }
+      }
+      
+      auditGroups.push(group);
+    }
 
     // Convert grouped attendance logs to consolidated entries
     const groupedLogs: GroupedLog[] = [];
@@ -263,9 +306,35 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
       });
     });
 
+    // Convert grouped audit logs to consolidated entries
+    const auditGroupedLogs: GroupedLog[] = [];
+    auditGroups.forEach((group) => {
+      if (group.length === 1) {
+        // Single audit log, keep as regular log
+        otherLogs.push(group[0]);
+      } else {
+        // Multiple audit logs grouped together
+        const firstLog = group[0];
+        const auditData = getAuditData(firstLog);
+        const tableName = auditData ? getTableDisplayName(auditData.table_name) : 'Record';
+        const action = auditData?.action || 'UPDATE';
+        
+        auditGroupedLogs.push({
+          id: `audit-group-${firstLog.id}`,
+          run_id: `audit-group-${firstLog.id}`,
+          source: firstLog.source,
+          level: firstLog.level,
+          created_at: firstLog.created_at,
+          summary: `${action === 'INSERT' ? 'Created' : action === 'DELETE' ? 'Deleted' : 'Updated'} ${group.length} ${tableName.toLowerCase()}${group.length !== 1 ? 's' : ''}`,
+          logs: group,
+        });
+      }
+    });
+
     // Combine and sort by date
     const allItems: (GroupedLog | SystemLog)[] = [
       ...groupedLogs,
+      ...auditGroupedLogs,
       ...otherLogs
     ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
@@ -665,6 +734,94 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
               }
               
               if (isGroupedLog(item)) {
+                // Check if it's a grouped audit log
+                const isAuditGroup = item.source.startsWith('audit-');
+                
+                if (isAuditGroup) {
+                  // Grouped audit logs
+                  const firstAudit = getAuditData(item.logs[0]);
+                  return (
+                    <div
+                      key={item.id}
+                      className={`rounded-lg border p-2 sm:p-3 transition-all ${getLevelColor(item.level)}`}
+                    >
+                      <div 
+                        className="flex items-start gap-2 cursor-pointer"
+                        onClick={() => toggleExpand(item.id)}
+                      >
+                        {expandedLogs.has(item.id) ? (
+                          <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                        ) : (
+                          <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                        )}
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                            <span className="text-[10px] sm:text-xs text-muted-foreground">
+                              {formatTime(item.created_at)}
+                            </span>
+                            {firstAudit && (
+                              <span className={`text-[10px] sm:text-xs px-1.5 py-0.5 rounded border flex items-center gap-1 ${getActionColor(firstAudit.action)}`}>
+                                {getActionIcon(firstAudit.action)}
+                                {firstAudit.action}
+                              </span>
+                            )}
+                            {firstAudit && (
+                              <span className="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-secondary/50 text-muted-foreground">
+                                {getTableDisplayName(firstAudit.table_name)}
+                              </span>
+                            )}
+                            <span className="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                              {item.logs.length} changes
+                            </span>
+                          </div>
+                          <p className="text-xs sm:text-sm text-foreground break-words">{item.summary}</p>
+                        </div>
+                      </div>
+
+                      {expandedLogs.has(item.id) && (
+                        <div className="mt-2 ml-6 sm:ml-8 space-y-1.5 max-h-60 overflow-y-auto">
+                          {item.logs.map((log) => {
+                            const auditData = getAuditData(log);
+                            if (!auditData) return null;
+                            const diff = calculateDiff(auditData.old_data, auditData.new_data);
+                            return (
+                              <div key={log.id} className="p-2 rounded bg-background/50 border border-border/30">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-[10px] text-muted-foreground">
+                                    Record: {auditData.record_id.substring(0, 8)}...
+                                  </span>
+                                </div>
+                                {diff.map((change, idx) => (
+                                  <div key={idx} className="mt-1 p-1.5 rounded bg-background/30">
+                                    <span className="text-[10px] font-medium text-foreground capitalize">
+                                      {change.field.replace(/_/g, ' ')}
+                                    </span>
+                                    <div className="mt-0.5 space-y-0.5">
+                                      {change.oldValue !== null && (
+                                        <div className="flex items-start gap-1">
+                                          <span className="text-[10px] text-red-400 flex-shrink-0">−</span>
+                                          <span className="text-[10px] text-red-400 break-all">{formatValue(change.oldValue)}</span>
+                                        </div>
+                                      )}
+                                      {change.newValue !== null && (
+                                        <div className="flex items-start gap-1">
+                                          <span className="text-[10px] text-green-400 flex-shrink-0">+</span>
+                                          <span className="text-[10px] text-green-400 break-all">{formatValue(change.newValue)}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 // Grouped attendance log
                 return (
                   <div
@@ -779,3 +936,4 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
 };
 
 export default SystemLogs;
+
