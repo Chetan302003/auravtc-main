@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import BulkSlotEditor from '@/components/admin/BulkSlotEditor';
 import {
   Table,
   TableBody,
@@ -546,6 +547,11 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                     <span className="text-xs text-muted-foreground">
                       Current: {slotCount} slots
                     </span>
+                    <BulkSlotEditor
+                      eventId={selectedEventId}
+                      slotCount={slotCount}
+                      onComplete={() => fetchSlots(selectedEventId)}
+                    />
                   </div>
                 </div>
 
