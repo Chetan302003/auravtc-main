@@ -61,7 +61,6 @@ interface GalleryItem {
 
 interface GalleryManagementProps {
   isAdmin : boolean;
-  hasmediaRole: boolean;
 }
 
 const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
