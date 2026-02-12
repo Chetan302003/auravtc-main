@@ -60,10 +60,10 @@ interface GalleryItem {
 }
 
 interface GalleryManagementProps {
-  isAdmin: boolean;
+  isAdmin || hasRole('hr') : boolean;
 }
 
-const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
+const GalleryManagement = ({ isAdmin || hasRole('media') }: GalleryManagementProps) => {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -284,13 +284,13 @@ const GalleryManagement = ({ isAdmin }: GalleryManagementProps) => {
     setFormInstagramUrl(item.instagram_url || '');
   };
 
-  if (!isAdmin) {
-    return (
-      <div className="glass-card rounded-xl border border-primary/20 p-6">
-        <p className="text-muted-foreground text-center">Admin access required</p>
-      </div>
-    );
-  }
+  // if (!isAdmin) {
+  //   return (
+  //     <div className="glass-card rounded-xl border border-primary/20 p-6">
+  //       <p className="text-muted-foreground text-center">Admin access required</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="glass-card rounded-xl border border-primary/20 overflow-hidden">
