@@ -306,7 +306,6 @@ const getSlotLabel = (slotNumber: number) => {
               <div className="lg:col-span-2">
                 <div className="glass-card rounded-2xl p-6 sm:p-8">
                   <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
-                        <div className="flex items-center gap-3 mb-6">
                     <Truck className="w-6 h-6 text-primary" />
                     <h2 className="font-display text-xl sm:text-2xl font-bold">Convoy Slots</h2>
                   </div>
