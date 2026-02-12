@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import SlotGrid from '@/components/booking/SlotGrid';
 import BookingForm from '@/components/booking/BookingForm';
+import DownloadVTCList from '@/components/booking/DownloadVTCList';
+import WebhookSender from '@/components/booking/WebhookSender';
 import { toast } from 'sonner';
 
 interface TruckersMPEvent {
@@ -303,9 +305,18 @@ const getSlotLabel = (slotNumber: number) => {
               {/* Slot Grid */}
               <div className="lg:col-span-2">
                 <div className="glass-card rounded-2xl p-6 sm:p-8">
-                  <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+                    <div className="flex items-center gap-3">
+                      <Truck className="w-6 h-6 text-primary" />
+                      <h2 className="font-display text-xl sm:text-2xl font-bold">Convoy Slots</h2>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <DownloadVTCList eventName={event.name} approvedBookings={approvedBookings} />
+                      <WebhookSender event={event} slots={slots} />
+                    </div>
+                  {/* <div className="flex items-center gap-3 mb-6">
                     <Truck className="w-6 h-6 text-primary" />
-                    <h2 className="font-display text-xl sm:text-2xl font-bold">Convoy Slots</h2>
+                    <h2 className="font-display text-xl sm:text-2xl font-bold">Convoy Slots</h2> */}
                   </div>
 
                   {/* Legend */}
