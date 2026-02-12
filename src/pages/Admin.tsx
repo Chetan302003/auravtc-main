@@ -585,7 +585,7 @@ const Admin = () => {
             transition={{ duration: 0.5, delay: 0.71 }}
             className="mt-6"
           >
-            <DashboardAnalytics isAdmin={true} />
+            <DashboardAnalytics isAdmin={isAdmin} />
           </motion.div>
 
           
@@ -606,7 +606,7 @@ const Admin = () => {
             transition={{ duration: 0.5, delay: 0.75 }}
             className="mt-6"
           >
-            <SlotManagement isAdmin={isAdmin || hasRole('event')} />
+            <SlotManagement isAdmin={isAdmin} />
           </motion.div>
 
           {/* Gallery Management - Full Width */}
@@ -616,7 +616,7 @@ const Admin = () => {
             transition={{ duration: 0.5, delay: 0.78 }}
             className="mt-6"
           >
-          <GalleryManagement isAdmin={isAdmin || hasRole('media')} />
+          <GalleryManagement isAdmin={isAdmin} />
           </motion.div>
 
           {/* User Management - Full Width */}
@@ -626,7 +626,7 @@ const Admin = () => {
             transition={{ duration: 0.5, delay: 0.79 }}
             className="mt-6"
           >
-            <UserManagement isAdmin={isAdmin || hasRole('hr')} />
+            <UserManagement isAdmin={isAdmin} />
           </motion.div>
           
           {/* Applications Management - Visible to Admin and HR role */}
