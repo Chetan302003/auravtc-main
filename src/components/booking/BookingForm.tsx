@@ -45,10 +45,12 @@ interface BookingFormProps {
 
 const BookingForm = ({ eventId, slotNumber, eventName, eventSlug, eventBanner, onSuccess, onCancel }: BookingFormProps) => {
   const [submitting, setSubmitting] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
@@ -103,7 +105,7 @@ const BookingForm = ({ eventId, slotNumber, eventName, eventSlug, eventBanner, o
         // Don't fail the booking if webhook fails
       }
 
-      onSuccess();
+      setShowConfirmation(true);
     } catch (error) {
       console.error('Booking error:', error);
       toast.error('Failed to submit booking. Please try again.');
@@ -113,6 +115,60 @@ const BookingForm = ({ eventId, slotNumber, eventName, eventSlug, eventBanner, o
   };
 
   return (
+        <>
+    <Dialog open={showConfirmation} onOpenChange={(open) => {
+      if (!open) {
+        setShowConfirmation(false);
+        onSuccess();
+      }
+    }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="font-display flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+            Booking Submitted!
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 pt-2">
+          <p className="text-sm text-muted-foreground">
+            Your slot booking request has been submitted successfully. You will receive a confirmation on:
+          </p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30 border border-border/30">
+              <MessageCircle className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className="text-sm">Your <strong>Discord ID</strong> via Direct Message</span>
+            </div>
+            {watch('contact_email') && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30 border border-border/30">
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                <span className="text-sm">Your <strong>email</strong> ({watch('contact_email')})</span>
+              </div>
+            )}
+          </div>
+          <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
+            <p className="text-sm font-medium text-primary">⚡ Important!</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Please join our Discord server for a quicker response and real-time updates on your booking status.
+            </p>
+            <a
+              href="https://discord.com/invite/auravtc"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 mt-2 text-xs font-medium text-primary hover:underline"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              Join our Discord Server
+            </a>
+          </div>
+          <Button variant="glow" className="w-full" onClick={() => {
+            setShowConfirmation(false);
+            onSuccess();
+          }}>
+            Got it!
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="vtc_name">VTC Name *</Label>
@@ -232,6 +288,7 @@ const BookingForm = ({ eventId, slotNumber, eventName, eventSlug, eventBanner, o
         </Button>
       </div>
     </form>
+           </>
   );
 };
 
