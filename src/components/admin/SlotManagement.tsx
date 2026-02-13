@@ -56,6 +56,8 @@ import {
   ToggleLeft,
   Plus,
   Image as ImageIcon,
+  Download,
+  Webhook,
 } from 'lucide-react';
 
 interface Event {
@@ -64,6 +66,10 @@ interface Event {
   start_at: string;
   banner?: string | null;
   slot_booking_enabled?: boolean;
+  server?: { id: number; name: string };
+  departure?: { city: string; location: string };
+  arrive?: { city: string; location: string };
+  attendances?: { confirmed: number };
 }
 
 interface Slot {
@@ -655,6 +661,49 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                         </Dialog>
                       );
                     })}
+                  </div>
+                </div>
+                
+                {/* Export & Webhook Tools */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Download className="w-4 h-4" />
+                    Export & Webhook
+                  </h3>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <DownloadVTCList
+                      eventName={selectedEvent?.name || 'Event'}
+                      approvedBookings={bookings.filter(b => b.status === 'approved').map(b => ({
+                        slot_number: b.slot_number,
+                        vtc_name: b.vtc_name,
+                        member_count: b.member_count,
+                      }))}
+                    />
+                    <WebhookSender
+                      event={{
+                        id: selectedEvent?.id || 0,
+                        name: selectedEvent?.name || '',
+                        game: 'ETS2',
+                        server: selectedEvent?.server || { id: 0, name: 'Unknown' },
+                        departure: selectedEvent?.departure || { location: '', city: '' },
+                        arrive: selectedEvent?.arrive || { location: '', city: '' },
+                        start_at: selectedEvent?.start_at || '',
+                        banner: selectedEvent?.banner || null,
+                        attendances: selectedEvent?.attendances ? { confirmed: selectedEvent.attendances.confirmed, unsure: 0 } : { confirmed: 0, unsure: 0 },
+                      }}
+                      slots={slots.map(s => {
+                        const booking = bookings.find(b => b.slot_number === s.slot_number && b.status === 'approved');
+                        return {
+                          slot_number: s.slot_number,
+                          slot_label: s.slot_label,
+                          is_locked: s.is_locked,
+                          locked_for: s.locked_for,
+                          slot_image_url: s.slot_image_url,
+                          status: s.is_locked ? 'booked' as const : booking ? 'booked' as const : 'available' as const,
+                          booking: booking ? { vtc_name: booking.vtc_name, member_count: booking.member_count } : undefined,
+                        };
+                      })}
+                    />
                   </div>
                 </div>
 
