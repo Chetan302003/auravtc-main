@@ -19,12 +19,13 @@ import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
+import SmoothScroll from "./components/layout/SmoothScroll";
 
 const queryClient = new QueryClient();
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-  
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -47,17 +48,18 @@ const AnimatedRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-  <AuthProvider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AnimatedRoutes />
-      </BrowserRouter>
-      <SpeedInsights />
-      <Analytics />
-    </TooltipProvider>
-  </AuthProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <SmoothScroll />
+        <BrowserRouter>
+          <AnimatedRoutes />
+        </BrowserRouter>
+        <SpeedInsights />
+        <Analytics />
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
