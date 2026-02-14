@@ -25,11 +25,11 @@ const BulkSlotEditor = ({ eventId, slotCount, onComplete }: BulkSlotEditorProps)
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<'labels' | 'images' | 'both'>('both');
-  
+
   // Bulk text inputs - one per line format: "slot_number: value"
   const [bulkLabels, setBulkLabels] = useState('');
   const [bulkImages, setBulkImages] = useState('');
-  
+
   // Range apply
   const [rangeFrom, setRangeFrom] = useState('1');
   const [rangeTo, setRangeTo] = useState(slotCount.toString());
@@ -41,7 +41,7 @@ const BulkSlotEditor = ({ eventId, slotCount, onComplete }: BulkSlotEditorProps)
     text.split('\n').forEach(line => {
       const trimmed = line.trim();
       if (!trimmed) return;
-      
+
       // Support formats: "1: Label", "1 - Label", "1 Label", "1,Label"
       const match = trimmed.match(/^(\d+)\s*[:\-,]?\s*(.+)$/);
       if (match) {
@@ -69,7 +69,7 @@ const BulkSlotEditor = ({ eventId, slotCount, onComplete }: BulkSlotEditorProps)
 
       // Collect all unique slot numbers
       const allSlots = new Set([...labelEntries.keys(), ...imageEntries.keys()]);
-      
+
       const upserts = Array.from(allSlots).map(slotNum => ({
         event_id: eventId,
         slot_number: slotNum,
@@ -174,7 +174,7 @@ const BulkSlotEditor = ({ eventId, slotCount, onComplete }: BulkSlotEditorProps)
           Bulk Edit Slots
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto" data-lenis-prevent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Layers className="w-5 h-5 text-primary" />
@@ -192,11 +192,10 @@ const BulkSlotEditor = ({ eventId, slotCount, onComplete }: BulkSlotEditorProps)
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`flex-1 px-3 py-2 text-xs font-medium capitalize transition-colors ${
-                  mode === m
+                className={`flex-1 px-3 py-2 text-xs font-medium capitalize transition-colors ${mode === m
                     ? 'bg-primary/20 text-primary'
                     : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
-                }`}
+                  }`}
               >
                 {m}
               </button>

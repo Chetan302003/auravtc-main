@@ -155,7 +155,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
   // Calculate diff between old and new data
   const calculateDiff = (oldData: Record<string, unknown> | null, newData: Record<string, unknown> | null) => {
     const changes: { field: string; oldValue: unknown; newValue: unknown }[] = [];
-    
+
     if (!oldData && newData) {
       // INSERT - show all new fields
       Object.entries(newData).forEach(([key, value]) => {
@@ -178,7 +178,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         }
       });
     }
-    
+
     return changes;
   };
 
@@ -192,14 +192,14 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
   // Group attendance logs by run_id and consolidate
   const processedLogs = useMemo(() => {
     let filteredLogs = logs;
-    
+
     // Apply category filter
     if (categoryFilter === 'audit') {
       filteredLogs = filteredLogs.filter(l => l.source.startsWith('audit-'));
     } else if (categoryFilter === 'system') {
       filteredLogs = filteredLogs.filter(l => !l.source.startsWith('audit-'));
     }
-    
+
     // Apply source filter
     if (sourceFilter !== 'all') {
       filteredLogs = filteredLogs.filter(l => l.source === sourceFilter);
@@ -225,10 +225,10 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
     // Group audit logs by table + user within a 5-second window
     const auditGroups: SystemLog[][] = [];
     const usedAuditIndices = new Set<number>();
-    
+
     // Sort audit logs by time
     const sortedAudit = [...auditLogs].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-    
+
     for (let i = 0; i < sortedAudit.length; i++) {
       if (usedAuditIndices.has(i)) continue;
       const log = sortedAudit[i];
@@ -237,28 +237,28 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         otherLogs.push(log);
         continue;
       }
-      
+
       const group: SystemLog[] = [log];
       usedAuditIndices.add(i);
       const baseTime = new Date(log.created_at).getTime();
-      
+
       for (let j = i + 1; j < sortedAudit.length; j++) {
         if (usedAuditIndices.has(j)) continue;
         const other = sortedAudit[j];
         const otherAudit = getAuditData(other);
         if (!otherAudit) continue;
-        
+
         const timeDiff = Math.abs(new Date(other.created_at).getTime() - baseTime);
         if (timeDiff > 5000) break; // beyond 5s window
-        
-        if (otherAudit.table_name === auditData.table_name && 
-            other.user_id === log.user_id &&
-            otherAudit.action === auditData.action) {
+
+        if (otherAudit.table_name === auditData.table_name &&
+          other.user_id === log.user_id &&
+          otherAudit.action === auditData.action) {
           group.push(other);
           usedAuditIndices.add(j);
         }
       }
-      
+
       auditGroups.push(group);
     }
 
@@ -268,7 +268,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
     runGroups.forEach((logsInRun, runId) => {
       // Sort by time
       logsInRun.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-      
+
       // Find summary log or create one
       const summaryLog = logsInRun.find(l => l.message.includes('completed') || l.message.includes('Attendance check'));
       const firstLog = logsInRun[0];
@@ -318,7 +318,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         const auditData = getAuditData(firstLog);
         const tableName = auditData ? getTableDisplayName(auditData.table_name) : 'Record';
         const action = auditData?.action || 'UPDATE';
-        
+
         auditGroupedLogs.push({
           id: `audit-group-${firstLog.id}`,
           run_id: `audit-group-${firstLog.id}`,
@@ -354,7 +354,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         .neq('id', '00000000-0000-0000-0000-000000000000');
 
       if (error) throw error;
-      
+
       toast.success('Logs cleared');
       fetchLogs();
     } catch (error: unknown) {
@@ -420,7 +420,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
   // Export logs to CSV
   const exportToCSV = () => {
     const headers = ['Timestamp', 'Level', 'Source', 'Type', 'Action', 'Table', 'Message', 'Record ID', 'User ID', 'Data'];
-    
+
     const rows = processedLogs.map(item => {
       if (isGroupedLog(item)) {
         return [
@@ -520,7 +520,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         key={log.id}
         className={`rounded-lg border p-2 sm:p-3 transition-all ${getLevelColor(log.level)}`}
       >
-        <div 
+        <div
           className="flex items-start gap-2 cursor-pointer"
           onClick={() => toggleExpand(log.id)}
         >
@@ -529,25 +529,25 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
           ) : (
             <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
           )}
-          
+
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
               <span className="text-[10px] sm:text-xs text-muted-foreground">
                 {formatTime(log.created_at)}
               </span>
-              
+
               {/* Action badge */}
               <span className={`text-[10px] sm:text-xs px-1.5 py-0.5 rounded border flex items-center gap-1 ${getActionColor(auditData.action)}`}>
                 {getActionIcon(auditData.action)}
                 {auditData.action}
               </span>
-              
+
               {/* Table name badge */}
               <span className="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-secondary/50 text-muted-foreground">
                 {getTableDisplayName(auditData.table_name)}
               </span>
             </div>
-            
+
             <p className="text-xs sm:text-sm text-foreground break-words">
               {auditData.action === 'INSERT' && `New ${getTableDisplayName(auditData.table_name).toLowerCase()} created`}
               {auditData.action === 'UPDATE' && `${getTableDisplayName(auditData.table_name)} updated`}
@@ -597,7 +597,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                 <span className="text-[10px] sm:text-xs text-muted-foreground">No field changes to display</span>
               </div>
             )}
-            
+
             {/* Record ID */}
             <div className="text-[9px] sm:text-[10px] text-muted-foreground mt-2">
               Record ID: {auditData.record_id}
@@ -616,7 +616,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
             <Database className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             System Logs
           </h2>
-          
+
           <div className="flex flex-wrap items-center gap-2">
             {/* Category filter */}
             <div className="flex rounded-lg border border-border/30 overflow-hidden">
@@ -624,11 +624,10 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                 <button
                   key={cat}
                   onClick={() => setCategoryFilter(cat)}
-                  className={`px-2 py-1 text-[10px] sm:text-xs font-medium capitalize transition-colors ${
-                    categoryFilter === cat 
-                      ? 'bg-primary/20 text-primary' 
+                  className={`px-2 py-1 text-[10px] sm:text-xs font-medium capitalize transition-colors ${categoryFilter === cat
+                      ? 'bg-primary/20 text-primary'
                       : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
-                  }`}
+                    }`}
                 >
                   {cat === 'audit' ? 'Changes' : cat}
                 </button>
@@ -653,11 +652,10 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-2 py-1 text-[10px] sm:text-xs font-medium capitalize transition-colors ${
-                    filter === f 
-                      ? 'bg-primary/20 text-primary' 
+                  className={`px-2 py-1 text-[10px] sm:text-xs font-medium capitalize transition-colors ${filter === f
+                      ? 'bg-primary/20 text-primary'
                       : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
-                  }`}
+                    }`}
                 >
                   {f}
                 </button>
@@ -715,7 +713,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
         </div>
       </div>
 
-      <ScrollArea className="h-80 sm:h-96">
+      <ScrollArea className="h-80 sm:h-96" data-lenis-prevent>
         {loading ? (
           <div className="flex items-center justify-center p-8">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -732,11 +730,11 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
               if (!isGroupedLog(item) && isAuditLog(item as SystemLog)) {
                 return renderAuditLog(item as SystemLog);
               }
-              
+
               if (isGroupedLog(item)) {
                 // Check if it's a grouped audit log
                 const isAuditGroup = item.source.startsWith('audit-');
-                
+
                 if (isAuditGroup) {
                   // Grouped audit logs
                   const firstAudit = getAuditData(item.logs[0]);
@@ -745,7 +743,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                       key={item.id}
                       className={`rounded-lg border p-2 sm:p-3 transition-all ${getLevelColor(item.level)}`}
                     >
-                      <div 
+                      <div
                         className="flex items-start gap-2 cursor-pointer"
                         onClick={() => toggleExpand(item.id)}
                       >
@@ -754,7 +752,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                         ) : (
                           <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                         )}
-                        
+
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
                             <span className="text-[10px] sm:text-xs text-muted-foreground">
@@ -828,7 +826,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                     key={item.id}
                     className={`rounded-lg border p-2 sm:p-3 transition-all ${getLevelColor(item.level)}`}
                   >
-                    <div 
+                    <div
                       className="flex items-start gap-2 cursor-pointer"
                       onClick={() => toggleExpand(item.id)}
                     >
@@ -837,9 +835,9 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                       ) : (
                         <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                       )}
-                      
+
                       {getLevelIcon(item.level)}
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
                           <span className="text-[10px] sm:text-xs text-muted-foreground">
@@ -888,7 +886,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                     key={log.id}
                     className={`rounded-lg border p-2 sm:p-3 transition-all ${getLevelColor(log.level)}`}
                   >
-                    <div 
+                    <div
                       className="flex items-start gap-2 cursor-pointer"
                       onClick={() => log.data && toggleExpand(log.id)}
                     >
@@ -901,9 +899,9 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                       ) : (
                         <div className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                       )}
-                      
+
                       {getLevelIcon(log.level)}
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
                           <span className="text-[10px] sm:text-xs text-muted-foreground">

@@ -296,23 +296,11 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Hidden but functional */
 ::-webkit-scrollbar {
-  width: 8px;
+  display: none;
 }
 
-::-webkit-scrollbar-track {
-  background: hsl(0 0% 6%);
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(120 100% 50% / 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(120 100% 50% / 0.5);
-}
 
 /* Page transition */
 .page-enter {

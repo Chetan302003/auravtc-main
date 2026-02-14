@@ -154,7 +154,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
       // Fetch from VTC events API (our own events)
       const { data, error } = await supabase.functions.invoke('truckersmp-vtc-events');
       if (error) throw error;
-      
+
       if (data?.events) {
         // Fetch booking enabled states from new event_booking_settings table
         const eventIds = data.events.map((e: Event) => e.id.toString());
@@ -162,13 +162,13 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
           .from('event_booking_settings')
           .select('truckersmp_event_id, booking_enabled')
           .in('truckersmp_event_id', eventIds);
-        
+
         const toggleStates: Record<number, boolean> = {};
         bookingSettings?.forEach(s => {
           toggleStates[parseInt(s.truckersmp_event_id)] = s.booking_enabled ?? true;
         });
         setBookingToggleStates(toggleStates);
-        
+
         setEvents(data.events.slice(0, 10));
       }
     } catch (error) {
@@ -182,7 +182,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
       .select('*')
       .eq('event_id', eventId)
       .order('slot_number');
-    
+
     if (!error && data) {
       setSlots(data as Slot[]);
       // Update slot count based on existing slots
@@ -200,7 +200,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
       .select('*')
       .eq('event_id', eventId)
       .order('slot_number');
-    
+
     if (!error && data) {
       setBookings(data as Booking[]);
     }
@@ -312,7 +312,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
   const handleApproveReject = async (booking: Booking, action: 'accept' | 'reject') => {
     if (!isAdmin) return;
     setActionLoading(booking.id);
-    
+
     try {
       const { error } = await supabase.functions.invoke('discord-booking-callback', {
         body: {
@@ -492,7 +492,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
               <ToggleLeft className="w-4 h-4" />
               Booking System Toggle
             </h3>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
+            <div className="space-y-2 max-h-40 overflow-y-auto" data-lenis-prevent>
               {events.slice(0, 6).map((event) => (
                 <div
                   key={event.id}
@@ -569,7 +569,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                     <Tag className="w-4 h-4" />
                     Configure Slots
                   </h3>
-                  <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 rounded-lg bg-secondary/20">
+                  <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 rounded-lg bg-secondary/20" data-lenis-prevent>
                     {Array.from({ length: slotCount }, (_, i) => i + 1).map((num) => {
                       const slot = slots.find(s => s.slot_number === num);
                       const booking = bookings.find(b => b.slot_number === num);
@@ -582,15 +582,14 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                           <DialogTrigger asChild>
                             <button
                               onClick={() => openEditSlotDialog(num)}
-                              className={`w-8 h-8 rounded text-xs font-medium transition-all ${
-                                isLocked
+                              className={`w-8 h-8 rounded text-xs font-medium transition-all ${isLocked
                                   ? 'bg-purple-500/30 text-purple-400 border border-purple-500/50'
                                   : isBooked
-                                  ? 'bg-red-500/30 text-red-400 border border-red-500/50'
-                                  : isPending
-                                  ? 'bg-yellow-500/30 text-yellow-400 border border-yellow-500/50'
-                                  : 'bg-green-500/30 text-green-400 border border-green-500/50 hover:bg-green-500/40'
-                              }`}
+                                    ? 'bg-red-500/30 text-red-400 border border-red-500/50'
+                                    : isPending
+                                      ? 'bg-yellow-500/30 text-yellow-400 border border-yellow-500/50'
+                                      : 'bg-green-500/30 text-green-400 border border-green-500/50 hover:bg-green-500/40'
+                                }`}
                             >
                               {num}
                             </button>
@@ -665,7 +664,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                     })}
                   </div>
                 </div>
-                
+
                 {/* Export & Webhook Tools */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -730,7 +729,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                       No bookings for this event yet
                     </p>
                   ) : (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto" data-lenis-prevent>
                       <Table>
                         <TableHeader>
                           <TableRow>

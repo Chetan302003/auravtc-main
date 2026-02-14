@@ -60,7 +60,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  
+
   // Dialog state
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -155,7 +155,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
 
   const handleReject = async () => {
     if (!selectedApplication) return;
-    
+
     if (!rejectionReason.trim()) {
       toast.error('Please provide a rejection reason');
       return;
@@ -180,12 +180,12 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
       setApplications(prev =>
         prev.map(app =>
           app.id === selectedApplication.id
-            ? { 
-                ...app, 
-                status: 'rejected', 
-                rejection_reason: rejectionReason,
-                reviewed_at: new Date().toISOString() 
-              }
+            ? {
+              ...app,
+              status: 'rejected',
+              rejection_reason: rejectionReason,
+              reviewed_at: new Date().toISOString()
+            }
             : app
         )
       );
@@ -247,7 +247,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
             <FileText className="w-5 h-5 text-primary" />
             HR Applications
           </h2>
-          
+
           <Button
             variant="outline"
             size="sm"
@@ -322,7 +322,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
             </p>
           </div>
         ) : (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-3 max-h-96 overflow-y-auto" data-lenis-prevent>
             {filteredApplications.map((application) => (
               <div
                 key={application.id}
@@ -384,14 +384,14 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
 
       {/* Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" data-lenis-prevent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-primary" />
               Application Details
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedApplication && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -496,7 +496,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
               Please provide a reason for rejecting this application. This will be sent to the applicant via Discord DM.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-2">
             <Textarea
               placeholder="Enter rejection reason..."

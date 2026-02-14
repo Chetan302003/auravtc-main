@@ -12,6 +12,10 @@ const SmoothScroll = () => {
             wheelMultiplier: 1,
             syncTouch: false,
             touchMultiplier: 2,
+            prevent: (node) => {
+                return !!node.closest('[data-lenis-prevent]') ||
+                    !!node.closest('.lenis-prevent');
+            }
         });
 
         function raf(time: number) {

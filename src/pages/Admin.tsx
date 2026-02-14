@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Users, 
-  Wifi, 
-  Calendar, 
-  RefreshCw, 
-  LogOut, 
+import {
+  Users,
+  Wifi,
+  Calendar,
+  RefreshCw,
+  LogOut,
   Settings,
   UserCheck,
   MapPin,
@@ -92,7 +92,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth' , { replace: true });
+      navigate('/auth', { replace: true });
     }
   }, [user, loading, navigate]);
 
@@ -162,9 +162,9 @@ const Admin = () => {
     setIsSyncing(true);
     try {
       const { data, error } = await supabase.functions.invoke('sync-vtc-members');
-      
+
       if (error) throw error;
-      
+
       toast.success(`Synced ${data?.synced || 0} members from TruckersMP`);
       fetchData();
     } catch (error: any) {
@@ -232,16 +232,16 @@ const Admin = () => {
     );
   }
 
-  const StatCard = ({ 
-    title, 
-    value, 
-    icon: Icon, 
-    suffix = '', 
-    delay = 0 
-  }: { 
-    title: string; 
-    value: number | string; 
-    icon: any; 
+  const StatCard = ({
+    title,
+    value,
+    icon: Icon,
+    suffix = '',
+    delay = 0
+  }: {
+    title: string;
+    value: number | string;
+    icon: any;
     suffix?: string;
     delay?: number;
   }) => (
@@ -269,7 +269,7 @@ const Admin = () => {
     <Layout>
       <div className="min-h-screen pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 relative">
         <ParticleBackground />
-        
+
         <div className="container mx-auto max-w-7xl relative z-10">
           {/* Header */}
           <motion.div
@@ -292,7 +292,7 @@ const Admin = () => {
                 {!isAdmin && <span className="ml-2 text-muted-foreground">(Read-only)</span>}
               </p>
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {isAdmin && (
                 <>
@@ -339,29 +339,29 @@ const Admin = () => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <StatCard 
-              title="Total Members" 
-              value={stats.totalMembers} 
-              icon={Users} 
+            <StatCard
+              title="Total Members"
+              value={stats.totalMembers}
+              icon={Users}
               delay={0.1}
             />
-            <StatCard 
-              title="Currently Online" 
-              value={stats.onlineMembers} 
-              icon={Wifi} 
+            <StatCard
+              title="Currently Online"
+              value={stats.onlineMembers}
+              icon={Wifi}
               delay={0.2}
             />
-            <StatCard 
-              title="Last Attendance" 
-              value={stats.lastAttendancePercent} 
-              icon={UserCheck} 
-              suffix="%" 
+            <StatCard
+              title="Last Attendance"
+              value={stats.lastAttendancePercent}
+              icon={UserCheck}
+              suffix="%"
               delay={0.3}
             />
-            <StatCard 
-              title="Total Events" 
-              value={stats.totalEvents} 
-              icon={Calendar} 
+            <StatCard
+              title="Total Events"
+              value={stats.totalEvents}
+              icon={Calendar}
               delay={0.4}
             />
           </div>
@@ -393,8 +393,8 @@ const Admin = () => {
                   </div>
                 </div>
               </div>
-              
-               <div className="overflow-x-auto max-h-80 sm:max-h-96 min-h-0">
+
+              <div className="overflow-x-auto max-h-80 sm:max-h-96 min-h-0" data-lenis-prevent>
                 {dataLoading ? (
                   <div className="flex items-center justify-center p-8 sm:p-12">
                     <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-primary" />
@@ -508,8 +508,8 @@ const Admin = () => {
                     Recent Events
                   </h2>
                 </div>
-                
-                <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-56 sm:max-h-64 overflow-y-auto">
+
+                <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 max-h-56 sm:max-h-64 overflow-y-auto" data-lenis-prevent>
                   {events.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-6 sm:p-8 text-center">
                       <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground mb-2 sm:mb-3" />
@@ -528,13 +528,12 @@ const Admin = () => {
                         >
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <h3 className="font-medium text-foreground text-xs sm:text-sm line-clamp-2">{event.name}</h3>
-                            <span className={`px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-medium rounded-full capitalize whitespace-nowrap ${
-                              isToday 
-                                ? 'bg-yellow-500/20 text-yellow-500' 
-                                : isUpcoming
+                            <span className={`px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-medium rounded-full capitalize whitespace-nowrap ${isToday
+                              ? 'bg-yellow-500/20 text-yellow-500'
+                              : isUpcoming
                                 ? 'bg-primary/20 text-primary'
                                 : 'bg-secondary text-muted-foreground'
-                            }`}>
+                              }`}>
                               {isToday ? 'Today' : isUpcoming ? 'Upcoming' : 'Past'}
                             </span>
                           </div>
@@ -578,7 +577,7 @@ const Admin = () => {
             </div>
           </div>
 
-         {/* Dashboard Analytics - Visible to all authenticated users */}
+          {/* Dashboard Analytics - Visible to all authenticated users */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -588,7 +587,7 @@ const Admin = () => {
             <DashboardAnalytics isAdmin={isAdmin} />
           </motion.div>
 
-          
+
           {/* VTC Settings Management - Full Width */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -616,7 +615,7 @@ const Admin = () => {
             transition={{ duration: 0.5, delay: 0.78 }}
             className="mt-6"
           >
-          <GalleryManagement isAdmin={isAdmin} />
+            <GalleryManagement isAdmin={isAdmin} />
           </motion.div>
 
           {/* User Management - Full Width */}
@@ -628,18 +627,18 @@ const Admin = () => {
           >
             <UserManagement isAdmin={isAdmin} />
           </motion.div>
-          
+
           {/* Applications Management - Visible to Admin and HR role */}
-          
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.795 }}
-              className="mt-6"
-            >
-              <ApplicationsManagement isAdmin={isAdmin} />
-            </motion.div>
-           
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.795 }}
+            className="mt-6"
+          >
+            <ApplicationsManagement isAdmin={isAdmin} />
+          </motion.div>
+
           {/* System Logs - Full Width */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -647,7 +646,7 @@ const Admin = () => {
             transition={{ duration: 0.5, delay: 0.8 }}
             className="mt-6"
           >
-            <SystemLogs isAdmin={isAdmin } />
+            <SystemLogs isAdmin={isAdmin} />
           </motion.div>
           {/* User Info Footer */}
           <motion.div

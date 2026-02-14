@@ -95,7 +95,7 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  
+
   // Form state
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -131,7 +131,7 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
         const userRoles = (rolesData || [])
           .filter(r => r.user_id === profile.id)
           .map(r => r.role);
-        
+
         return {
           id: profile.id,
           email: profile.display_name || 'No email',
@@ -185,7 +185,7 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
       fetchUsers();
     } catch (err: any) {
       toast.error(err.message || 'Failed to create user');
-          } finally {
+    } finally {
       setActionLoading(null);
     }
   };
@@ -330,7 +330,7 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
     setSelectedUserId(userId);
     setResetPassword('');
     setIsResetPasswordDialogOpen(true);
-      };
+  };
 
   if (!isAdmin) {
     return (
@@ -347,7 +347,7 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
           <Users className="w-5 h-5 text-primary" />
           User Management
         </h2>
-        
+
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2">
@@ -494,13 +494,12 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
             No users found. Create a user to get started.
           </p>
         ) : (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-3 max-h-96 overflow-y-auto" data-lenis-prevent>
             {users.map((user) => (
               <div
                 key={user.id}
-                className={`flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-lg border border-border/30 ${
-                  user.is_banned ? 'bg-red-500/10' : 'bg-secondary/30'
-                }`}
+                className={`flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-lg border border-border/30 ${user.is_banned ? 'bg-red-500/10' : 'bg-secondary/30'
+                  }`}
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -509,7 +508,7 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
                     </p>
                     {user.roles.includes('admin') && (
                       <Shield className="w-4 h-4 text-red-400" />
-                                          )}
+                    )}
                     {user.is_banned && (
                       <Badge variant="outline" className="text-xs bg-red-500/20 text-red-400 border-red-500/30">
                         Deactivated
@@ -525,9 +524,9 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
                     <Badge variant="outline" className="text-xs">No roles</Badge>
                   ) : (
                     user.roles.map((role) => (
-                      <Badge 
-                        key={role} 
-                        variant="outline" 
+                      <Badge
+                        key={role}
+                        variant="outline"
                         className={`text-xs cursor-pointer ${ROLE_COLORS[role]}`}
                         onClick={() => handleRemoveRole(user.id, role)}
                         title="Click to remove"
@@ -539,7 +538,7 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
                 </div>
 
                 {/* Add role selector */}
-                <Select 
+                <Select
                   onValueChange={(role) => handleAddRole(user.id, role as AppRole)}
                   disabled={!!actionLoading}
                 >
@@ -570,7 +569,7 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     {user.is_banned ? (
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => handleReactivateUser(user.id)}
                         className="text-green-500"
                       >
@@ -578,7 +577,7 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
                         Reactivate User
                       </DropdownMenuItem>
                     ) : (
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => handleDeactivateUser(user.id)}
                         className="text-destructive"
                       >
@@ -586,10 +585,10 @@ const UserManagement = ({ isAdmin }: UserManagementProps) => {
                         Deactivate User
                       </DropdownMenuItem>
                     )}
-                                        <DropdownMenuSeparator />
+                    <DropdownMenuSeparator />
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onSelect={(e) => e.preventDefault()}
                           className="text-destructive"
                         >
