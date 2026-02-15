@@ -45,14 +45,14 @@ const Auth = () => {
   const [oauthLoading, setOauthLoading] = useState<'discord' | 'steam' | null>(null);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       navigate('/admin');
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

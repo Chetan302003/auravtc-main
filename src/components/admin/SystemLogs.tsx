@@ -50,9 +50,10 @@ interface AuditData {
 
 interface SystemLogsProps {
   isAdmin: boolean;
+  canDelete?: boolean;
 }
 
-const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
+const SystemLogs = ({ isAdmin, canDelete = false }: SystemLogsProps) => {
   const [logs, setLogs] = useState<SystemLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
@@ -342,8 +343,8 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
   }, [logs, sourceFilter, categoryFilter]);
 
   const handleClearLogs = async () => {
-    if (!isAdmin) {
-      toast.error('Only admins can clear logs');
+    if (!canDelete) {
+      toast.error('You do not have permission to clear logs');
       return;
     }
 
@@ -625,8 +626,8 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                   key={cat}
                   onClick={() => setCategoryFilter(cat)}
                   className={`px-2 py-1 text-[10px] sm:text-xs font-medium capitalize transition-colors ${categoryFilter === cat
-                      ? 'bg-primary/20 text-primary'
-                      : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
+                    ? 'bg-primary/20 text-primary'
+                    : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
                     }`}
                 >
                   {cat === 'audit' ? 'Changes' : cat}
@@ -653,8 +654,8 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
                   key={f}
                   onClick={() => setFilter(f)}
                   className={`px-2 py-1 text-[10px] sm:text-xs font-medium capitalize transition-colors ${filter === f
-                      ? 'bg-primary/20 text-primary'
-                      : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
+                    ? 'bg-primary/20 text-primary'
+                    : 'bg-secondary/30 text-muted-foreground hover:bg-secondary/50'
                     }`}
                 >
                   {f}
@@ -698,7 +699,7 @@ const SystemLogs = ({ isAdmin }: SystemLogsProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {isAdmin && (
+            {canDelete && (
               <Button
                 size="sm"
                 variant="outline"

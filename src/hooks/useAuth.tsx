@@ -1,12 +1,16 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { getPermissions, RolePermissions } from '@/config/permissions';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
+  role: string | null;
+  permissions: RolePermissions;
+  checkPermission: (permission: keyof RolePermissions) => boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -18,50 +22,63 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
+  const [permissions, setPermissions] = useState<RolePermissions>(getPermissions(null));
 
-  const checkAdminRole = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .eq('role', 'admin')
-      .maybeSingle();
-    
-    setIsAdmin(!!data);
+  // Backward compatibility for existing code using isAdmin
+  const isAdmin = checkPermission('view_dashboard');
+
+  function checkPermission(permission: keyof RolePermissions): boolean {
+    return permissions[permission];
+  }
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      const userRole = data?.role || null;
+      console.log('Fetched user role:', userRole);
+      setRole(userRole);
+      setPermissions(getPermissions(userRole));
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      setRole(null);
+      setPermissions(getPermissions(null));
+    }
   };
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    let mounted = true;
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
 
-        // Defer admin check with setTimeout to prevent deadlock
         if (session?.user) {
-          setTimeout(() => {
-            checkAdminRole(session.user.id);
-          }, 0);
+          setLoading(true); // Ensure loading is true while fetching role
+          fetchUserRole(session.user.id).then(() => {
+            if (mounted) setLoading(false);
+          });
         } else {
-          setIsAdmin(false);
+          setRole(null);
+          setPermissions(getPermissions(null));
+          if (mounted) setLoading(false);
         }
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-
-      if (session?.user) {
-        checkAdminRole(session.user.id);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -83,12 +100,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    setLoading(true);
     await supabase.auth.signOut();
-    setIsAdmin(false);
+    if (user) {
+      setUser(null);
+      setSession(null);
+      setRole(null);
+      setPermissions(getPermissions(null));
+    }
+    setLoading(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAdmin, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{
+      user,
+      session,
+      loading,
+      isAdmin,
+      role,
+      permissions,
+      checkPermission,
+      signIn,
+      signUp,
+      signOut
+    }}>
       {children}
     </AuthContext.Provider>
   );

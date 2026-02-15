@@ -40,7 +40,7 @@ const DashboardAnalytics = ({ isAdmin }: DashboardAnalyticsProps) => {
       const { data: bookings } = await supabase
         .from('slot_bookings')
         .select('status');
-      
+
       const bookingCounts: Record<string, number> = {};
       bookings?.forEach((b) => {
         bookingCounts[b.status] = (bookingCounts[b.status] || 0) + 1;
@@ -114,14 +114,6 @@ const DashboardAnalytics = ({ isAdmin }: DashboardAnalyticsProps) => {
     }
   };
 
-  if (!isAdmin) {
-    return (
-      <div className="glass-card rounded-xl border border-primary/20 p-6">
-        <p className="text-muted-foreground text-center">Admin access required</p>
-      </div>
-    );
-  }
-
   if (loading) {
     return (
       <div className="glass-card rounded-xl border border-primary/20 p-6">
@@ -194,9 +186,9 @@ const DashboardAnalytics = ({ isAdmin }: DashboardAnalyticsProps) => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '8px',
                     }}
@@ -219,9 +211,9 @@ const DashboardAnalytics = ({ isAdmin }: DashboardAnalyticsProps) => {
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
                   <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '8px',
                     }}
@@ -246,9 +238,9 @@ const DashboardAnalytics = ({ isAdmin }: DashboardAnalyticsProps) => {
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="role" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
                   <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '8px',
                     }}

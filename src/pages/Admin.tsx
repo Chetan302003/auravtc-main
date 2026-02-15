@@ -61,7 +61,7 @@ interface Stats {
 }
 
 const Admin = () => {
-  const { user, isAdmin, loading, signOut } = useAuth();
+  const { user, isAdmin, loading, signOut, checkPermission, role: userRole } = useAuth();
   const navigate = useNavigate();
 
   const [members, setMembers] = useState<Member[]>([]);
@@ -97,10 +97,10 @@ const Admin = () => {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    if (user) {
+    if (user && checkPermission('view_dashboard')) {
       fetchData();
     }
-  }, [user]);
+  }, [user, checkPermission]);
 
   const fetchData = async () => {
     setDataLoading(true);
@@ -232,6 +232,27 @@ const Admin = () => {
     );
   }
 
+  // If user is loaded but doesn't have permissions
+  if (user && !checkPermission('view_dashboard')) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="glass-card rounded-xl p-8 text-center max-w-md mx-4">
+            <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+            <h1 className="text-xl font-bold mb-2">Access Denied</h1>
+            <p className="text-muted-foreground mb-6">
+              You do not have permission to view the admin dashboard.
+            </p>
+            <div className="flex justify-center gap-4">
+              <Button onClick={() => navigate('/')} variant="outline">Back to Home</Button>
+              <Button onClick={handleSignOut} variant="destructive">Sign Out</Button>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   const StatCard = ({
     title,
     value,
@@ -288,8 +309,7 @@ const Admin = () => {
               </div>
               <p className="text-xs sm:text-sm text-muted-foreground truncate">
                 Welcome, <span className="break-all">{user?.email}</span>
-                {isAdmin && <span className="ml-2 text-primary">(Admin)</span>}
-                {!isAdmin && <span className="ml-2 text-muted-foreground">(Read-only)</span>}
+                {userRole && <span className="ml-2 text-primary uppercase">({userRole})</span>}
               </p>
             </div>
 
@@ -577,77 +597,96 @@ const Admin = () => {
             </div>
           </div>
 
-          {/* Dashboard Analytics - Visible to all authenticated users */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.71 }}
-            className="mt-6"
-          >
-            <DashboardAnalytics isAdmin={isAdmin} />
-          </motion.div>
+          {/* Dashboard Analytics - Visible to anyone with view_dashboard access */}
+          {checkPermission('view_dashboard') && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.71 }}
+              className="mt-6"
+            >
+              <DashboardAnalytics isAdmin={isAdmin} />
+            </motion.div>
+          )}
 
 
           {/* VTC Settings Management - Full Width */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.72 }}
-            className="mt-6"
-          >
-            <VTCSettingsManagement isAdmin={isAdmin} />
-          </motion.div>
+          {checkPermission('manage_settings') && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.72 }}
+              className="mt-6"
+            >
+              <VTCSettingsManagement isAdmin={isAdmin} />
+            </motion.div>
+          )}
+
 
           {/* Slot Management - Full Width */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.75 }}
-            className="mt-6"
-          >
-            <SlotManagement isAdmin={isAdmin} />
-          </motion.div>
+          {checkPermission('manage_slots') && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.75 }}
+              className="mt-6"
+            >
+              <SlotManagement isAdmin={isAdmin} />
+            </motion.div>
+          )}
 
           {/* Gallery Management - Full Width */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.78 }}
-            className="mt-6"
-          >
-            <GalleryManagement isAdmin={isAdmin} />
-          </motion.div>
+          {checkPermission('manage_gallery') && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.78 }}
+              className="mt-6"
+            >
+              <GalleryManagement isAdmin={isAdmin} />
+            </motion.div>
+          )}
+
 
           {/* User Management - Full Width */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.79 }}
-            className="mt-6"
-          >
-            <UserManagement isAdmin={isAdmin} />
-          </motion.div>
+          {checkPermission('manage_users') && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.79 }}
+              className="mt-6"
+            >
+              <UserManagement isAdmin={isAdmin} />
+            </motion.div>
+          )}
 
           {/* Applications Management - Visible to Admin and HR role */}
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.795 }}
-            className="mt-6"
-          >
-            <ApplicationsManagement isAdmin={isAdmin} />
-          </motion.div>
+          {checkPermission('manage_applications') && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.795 }}
+              className="mt-6"
+            >
+              <ApplicationsManagement isAdmin={isAdmin} />
+            </motion.div>
+          )}
 
           {/* System Logs - Full Width */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            className="mt-6"
-          >
-            <SystemLogs isAdmin={isAdmin} />
-          </motion.div>
+          {checkPermission('view_logs') && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="mt-6"
+            >
+              <SystemLogs
+                isAdmin={isAdmin}
+                canDelete={checkPermission('delete_logs')}
+              />
+            </motion.div>
+          )}
+
           {/* User Info Footer */}
           <motion.div
             initial={{ opacity: 0 }}
