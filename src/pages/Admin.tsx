@@ -647,19 +647,6 @@ const Admin = () => {
             </motion.div>
           )}
 
-
-          {/* User Management - Full Width */}
-          {checkPermission('manage_users') && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.79 }}
-              className="mt-6"
-            >
-              <UserManagement isAdmin={isAdmin} />
-            </motion.div>
-          )}
-
           {/* Applications Management - Visible to Admin and HR role */}
           {checkPermission('manage_applications') && (
             <motion.div
@@ -672,6 +659,20 @@ const Admin = () => {
             </motion.div>
           )}
 
+          
+          {/* User Management - Full Width */}
+          {checkPermission('manage_users') && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.79 }}
+              className="mt-6"
+            >
+              <UserManagement isAdmin={isAdmin} />
+            </motion.div>
+          )}
+
+          
           {/* System Logs - Full Width */}
           {checkPermission('view_logs') && (
             <motion.div
