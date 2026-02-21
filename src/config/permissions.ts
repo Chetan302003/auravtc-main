@@ -74,6 +74,8 @@ export const PERMISSIONS: Record<string, RolePermissions> = {
     view_dashboard: true,
     view_logs: true,
     manage_applications: true,
+    manage_users: true,
+
   },
   'media': {
     ...NO_ACCESS,
