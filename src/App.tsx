@@ -20,6 +20,7 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import SmoothScroll from "./components/layout/SmoothScroll";
+import Preloader from "./components/layout/Preloader";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
+        <Preloader />
         <Toaster />
         <Sonner />
         <SmoothScroll />
