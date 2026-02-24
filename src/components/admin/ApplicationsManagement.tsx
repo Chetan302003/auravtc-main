@@ -226,7 +226,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
   const stats = {
     total: applications.length,
     pending: applications.filter(a => a.status === 'pending').length,
-    accepted: applications.filter(a => a.status === 'accepted').length,
+    accepted: applications.filter(a => a.status === 'approved').length,
     rejected: applications.filter(a => a.status === 'rejected').length,
   };
 
@@ -300,7 +300,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="accepted">Accepted</SelectItem>
+            <SelectItem value="approved">Accepted</SelectItem>
             <SelectItem value="rejected">Rejected</SelectItem>
           </SelectContent>
         </Select>
