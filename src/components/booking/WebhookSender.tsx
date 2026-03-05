@@ -38,7 +38,7 @@ interface WebhookSenderProps {
 }
 
 // ── Replace with your actual Supabase project URL ──────────────────────────────
-const SUPABASE_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/discord-webhook`;
+const SUPABASE_FUNCTION_URL = 'https://paxmnwccxoftmnhvrlxk.supabase.co/functions/v1/discord-webhook';
 // ──────────────────────────────────────────────────────────────────────────────
 
 const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
