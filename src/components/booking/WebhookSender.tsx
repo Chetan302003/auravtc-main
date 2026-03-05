@@ -15,6 +15,7 @@ interface Slot {
   status: 'available' | 'pending' | 'booked';
   booking?: {
     vtc_name: string;
+    vtc_id?: number;
     member_count: number;
   };
 }
@@ -56,46 +57,74 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
 
     setSending(true);
 
-    // Build the Intro Embed
+    const eventUrl = `https://truckersmp.com/events/${event.id}`;
+    const ticketUrl = `https://truckersmp.com/events/${event.id}`; // replace with actual ticket URL if available
+
+    // Intro embed — matches Image 2 style
     const introEmbed = {
       title: event.name,
-      url: `https://truckersmp.com/events/${event.id}`,
-      description: `Welcome and thank you for your interest in [**${event.name}**](https://truckersmp.com/events/${event.id}).\n\nPlease select the suitable slot and open an **Event Team Ticket** to book a slot for your VTC containing the following information:\n\n1) Name of the VTC\n2) Desired Slot\n3) Estimated number of attendees\n4) Position within your VTC\n\nSlot bookings are updated as soon as a booking has been confirmed so please ensure the slot you wish to book is vacant and is not booked by any other VTC.`,
-      color: 0x1f8b4c, // Greenish color
+      url: eventUrl,
+      description: [
+        `Welcome and thank you for your interest in [**${event.name}**](${eventUrl}).`,
+        ``,
+        `Please select the suitable slot and open an [**Event Team Ticket**](${ticketUrl}) to book a slot for your VTC containing the following information:`,
+        ``,
+        `1) Name of the VTC`,
+        `2) Desired Slot`,
+        `3) Estimated number of attendees`,
+        `4) Position within your VTC`,
+        ``,
+        `Slot bookings are updated as soon as a booking has been confirmed so please ensure the slot you wish to book is vacant and is not booked by any other VTC.`,
+      ].join('\n'),
+      color: 0x1f8b4c,
       footer: {
-        text: `The Event Team of Aura • ${new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
-        icon_url: event.banner || undefined
-      }
+        text: `The Event Team of Aura • ${new Date().toLocaleString('en-GB', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })}`,
+        icon_url: event.banner || undefined,
+      },
     };
 
-    // Group slots by slot_label
-    const groups = new Map<string, { slots: Slot[], imageUrl: string | null }>();
+    // Group slots by slot_label — preserving insertion order
+    const groups = new Map<string, { slots: Slot[]; imageUrl: string | null }>();
 
-    slots.forEach(s => {
+    slots.forEach((s) => {
       const label = s.slot_label || `Slot #${s.slot_number}`;
       if (!groups.has(label)) {
-        groups.set(label, { slots: [], imageUrl: s.slot_image_url || event.banner });
+        groups.set(label, { slots: [], imageUrl: s.slot_image_url || event.banner || null });
       }
       groups.get(label)!.slots.push(s);
     });
 
-    const slotEmbeds: any[] = [];
+    const slotEmbeds: object[] = [];
 
     groups.forEach((group, label) => {
-      const vtcList = group.slots.map(s => {
-        if (s.is_locked && s.locked_for) {
-          return `- [**${s.locked_for}**](https://truckersmp.com) (Locked)`;
-        } else if (s.booking) {
-          return `- [**${s.booking.vtc_name}**](https://truckersmp.com)`;
-        } else {
-          return `- **Available**`;
-        }
-      }).join('\n');
+      // Build bullet list matching Image 2: "• **[VTC Name](url)**" or "• Available"
+      const vtcList = group.slots
+        .map((s) => {
+          if (s.is_locked && s.locked_for) {
+            // Locked slot — bold name, link to TruckersMP search or VTC page
+            return `• **[${s.locked_for}](https://truckersmp.com/vtc)** *(Reserved)*`;
+          } else if (s.status === 'booked' && s.booking) {
+            const vtcUrl = s.booking.vtc_id
+              ? `https://truckersmp.com/vtc/${s.booking.vtc_id}`
+              : `https://truckersmp.com/vtc`;
+            return `• **[${s.booking.vtc_name}](${vtcUrl})**`;
+          } else {
+            return `• Available`;
+          }
+        })
+        .join('\n');
 
       slotEmbeds.push({
         author: {
           name: event.name,
-          icon_url: event.banner ? event.banner : undefined
+          icon_url: event.banner || undefined,
+          url: eventUrl,
         },
         title: label,
         description: vtcList,
@@ -104,30 +133,31 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
       });
     });
 
-    // Discord allows up to 10 embeds per webhook POST.
+    // Combine intro + slot embeds; Discord allows max 10 per message
     const allEmbeds = [introEmbed, ...slotEmbeds];
-
-    // We need to chunk them in arrays of 10 max
-    const chunks = [];
+    const chunks: object[][] = [];
     for (let i = 0; i < allEmbeds.length; i += 10) {
       chunks.push(allEmbeds.slice(i, i + 10));
     }
 
     try {
       for (const chunk of chunks) {
-        await fetch(webhookUrl, {
+        const res = await fetch(webhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ embeds: chunk }),
-          // Removing mode: 'no-cors' so Content-Type validation passes on Discord
         });
 
+        if (!res.ok && res.status !== 0) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
         if (chunks.length > 1) {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
         }
       }
 
-      toast.success('Event details sent to webhook in Discord format!');
+      toast.success('Event details sent to Discord webhook!');
       setOpen(false);
       setWebhookUrl('');
     } catch (err) {
@@ -152,7 +182,7 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
         </DialogHeader>
         <div className="space-y-4 pt-2">
           <p className="text-sm text-muted-foreground">
-            Enter a webhook URL to send all event details including slot images, labels, and confirmed VTCs.
+            Enter a Discord webhook URL to post the full slot list with VTC links, section images, and booking status.
           </p>
           <div className="space-y-2">
             <Label htmlFor="webhook-url">Webhook URL</Label>
@@ -167,10 +197,10 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
           <div className="rounded-lg bg-muted/30 border border-border/30 p-3 text-xs text-muted-foreground space-y-1">
             <p className="font-medium text-foreground text-sm">Payload format: Discord Embeds</p>
             <ul className="list-disc list-inside space-y-0.5">
-              <li>Announcement embed with event information</li>
-              <li>Slot embeds grouped by section/label</li>
-              <li>Status of each slot (Booked VTCs, Locked, Available)</li>
-              <li>Slot preview images included where applicable</li>
+              <li>Intro embed with event info &amp; ticket instructions</li>
+              <li>Section embeds grouped by slot label</li>
+              <li>VTC names as bold hyperlinks (• <strong>VTC Name</strong>)</li>
+              <li>Slot preview images included per section</li>
             </ul>
           </div>
 
@@ -199,6 +229,7 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
 };
 
 export default WebhookSender;
+
 
 
 
