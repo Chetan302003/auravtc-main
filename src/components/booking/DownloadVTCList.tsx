@@ -3,13 +3,18 @@ import { Button } from '@/components/ui/button';
 import * as XLSX from 'xlsx';
 
 interface ApprovedBooking {
+  // From slot_bookings table
   slot_number: number;
   vtc_name: string;
-  vtc_id?: number;
   member_count: number;
-  slot_image_url?: string | null;
-  discord_id?: string | null;
+  discord_id: string;
   contact_name?: string | null;
+  contact_email?: string | null;
+  notes?: string | null;
+  created_at: string;
+  // Joined from event_slots
+  slot_image_url?: string | null;
+  slot_label?: string | null;
 }
 
 interface DownloadVTCListProps {
@@ -23,17 +28,25 @@ const DownloadVTCList = ({ eventName, approvedBookings }: DownloadVTCListProps) 
 
     const data = approvedBookings.map((b) => ({
       'Slot #': b.slot_number,
+      'Slot Label': b.slot_label || '',
       'VTC Name': b.vtc_name,
-      'VTC Link': b.vtc_id
-        ? `https://truckersmp.com/vtc/${b.vtc_id}`
-        : `https://truckersmp.com/vtc`,
       'Member Count': b.member_count,
       'Contact Name': b.contact_name || '',
-      'Discord ID': b.discord_id || '',
+      'Contact Email': b.contact_email || '',
+      'Discord ID': b.discord_id,
+      'Notes': b.notes || '',
+      'Booked At': new Date(b.created_at).toLocaleString('en-GB'),
       'Slot Image URL': b.slot_image_url || '',
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);
+
+    // Auto-width columns
+    const colWidths = Object.keys(data[0] || {}).map((key) => ({
+      wch: Math.max(key.length, ...data.map((row) => String(row[key as keyof typeof row] ?? '').length)),
+    }));
+    ws['!cols'] = colWidths;
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Confirmed VTCs');
 
