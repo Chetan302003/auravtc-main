@@ -37,9 +37,7 @@ interface WebhookSenderProps {
   slots: Slot[];
 }
 
-// ── Replace with your actual Supabase project URL ──────────────────────────────
 const SUPABASE_FUNCTION_URL = 'https://paxmnwccxoftmnhvrlxk.supabase.co/functions/v1/discord-webhook';
-// ──────────────────────────────────────────────────────────────────────────────
 
 const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
   const [open, setOpen] = useState(false);
@@ -106,10 +104,9 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
       if (s.slot_label) group.labels.add(s.slot_label);
     });
 
-    // ── Build imageUrls list & slot embeds ─────────────────────────────────────
-    const imageUrls: { key: string; url: string }[] = [];
-    const slotEmbeds: object[] = [];
-    let imageIndex = 0;
+    // ── Build sections array ───────────────────────────────────────────────────
+    // Each section = { embed (no image), imageUrl (sent separately as full-width file) }
+    const sections: { embed: object; imageUrl: string | null }[] = [];
 
     groups.forEach((group) => {
       const title =
@@ -133,63 +130,39 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
         })
         .join('\n');
 
-      // Register image as an attachment
-      let imageField: object | undefined = undefined;
-      if (group.imageUrl) {
-        const key = `image_${imageIndex}`;
-        imageUrls.push({ key, url: group.imageUrl });
-        imageField = { url: `attachment://${key}.png` };
-        imageIndex++;
-      }
-
-      slotEmbeds.push({
-        author: {
-          name: event.name,
-          icon_url: event.banner || undefined,
-          url: eventUrl,
+      sections.push({
+        embed: {
+          author: {
+            name: event.name,
+            icon_url: event.banner || undefined,
+            url: eventUrl,
+          },
+          title,
+          description: vtcList,
+          color: 0x1f8b4c,
+          // No image field — image is sent as standalone file for full width
         },
-        title,
-        description: vtcList,
-        color: 0x1f8b4c,
-        image: imageField,
+        imageUrl: group.imageUrl,
       });
     });
 
-    // ── Chunk embeds (max 10 per Discord message) ──────────────────────────────
-    const allEmbeds = [introEmbed, ...slotEmbeds];
-    const chunks: { embeds: object[]; imageUrls: { key: string; url: string }[] }[] = [];
-
-    for (let i = 0; i < allEmbeds.length; i += 10) {
-      const chunkEmbeds = allEmbeds.slice(i, i + 10);
-      const chunkImages = imageUrls.filter(({ key }) =>
-        chunkEmbeds.some((e: any) => e.image?.url === `attachment://${key}.png`)
-      );
-      chunks.push({ embeds: chunkEmbeds, imageUrls: chunkImages });
-    }
-
     try {
-      for (const chunk of chunks) {
-        const res = await fetch(SUPABASE_FUNCTION_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            webhookUrl,
-            embeds: chunk.embeds,
-            imageUrls: chunk.imageUrls,
-          }),
-        });
+      const res = await fetch(SUPABASE_FUNCTION_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          webhookUrl,
+          introEmbed,
+          sections,
+        }),
+      });
 
-        if (!res.ok) {
-          const err = await res.text();
-          throw new Error(err);
-        }
-
-        if (chunks.length > 1) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
       }
 
       toast.success('Event details sent to Discord webhook!');
@@ -235,7 +208,7 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
               <li>Intro embed with event info &amp; ticket instructions</li>
               <li>Section embeds grouped by shared slot image</li>
               <li>VTC names as bold hyperlinks</li>
-              <li>Images sent as full-size attachments via Supabase Edge Function</li>
+              <li>Images posted as standalone files for maximum size</li>
             </ul>
           </div>
 
@@ -264,7 +237,6 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
 };
 
 export default WebhookSender;
-
 
 // import { useState } from 'react';
 // import { Send, Loader2, Webhook } from 'lucide-react';
