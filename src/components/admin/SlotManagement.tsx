@@ -674,21 +674,17 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                   <div className="flex items-center gap-2 flex-wrap">
                     <DownloadVTCList
                       eventName={selectedEvent?.name || 'Event'}
-                      approvedBookings={bookings.filter(b => b.status === 'approved').map(b => {
-                     const matchedSlot = slots.find(s => s.slot_number === b.slot_number);
-                      return {
-     slot_number: b.slot_number,
-    vtc_name: b.vtc_name,
-    member_count: b.member_count,
-    discord_id: b.discord_id,
-    contact_name: b.contact_name,
-    contact_email: b.contact_email,
-    notes: b.notes,
-    created_at: b.created_at,
-    slot_label: slot?.slot_label ?? null,
-    slot_image_url: slot?.slot_image_url ?? null,
-};
-                        ))}
+                          approvedBookings={bookings.filter(b => b.status === 'approved').map(b => ({
+                          slot_number: b.slot_number,
+                          vtc_name: b.vtc_name,
+                          member_count: b.member_count,
+                          contact_name: b.contact_name,
+                          contact_email: b.contact_email,
+                          notes: b.notes,
+                          created_at: b.created_at,
+                          slot_label: b.slot_label,
+                          slot_image_url: b.slot_image_url ?? null,
+                         }))}
                     />
                     <WebhookSender
                       event={{
