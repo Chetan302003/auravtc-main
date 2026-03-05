@@ -677,7 +677,14 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                       approvedBookings={bookings.filter(b => b.status === 'approved').map(b => ({
                         slot_number: b.slot_number,
                         vtc_name: b.vtc_name,
-                        member_count: b.member_count,
+                         member_count: b.member_count,
+                          discord_id: b.discord_id,
+                          contact_name: b.contact_name,
+                          contact_email: b.contact_email,
+                          notes: b.notes,
+                          created_at: b.created_at,
+                          slot_label: slot?.slot_label ?? null,
+                          slot_image_url: slot?.slot_image_url ?? null,
                       }))}
                     />
                     <WebhookSender
