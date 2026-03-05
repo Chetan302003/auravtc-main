@@ -688,12 +688,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
     slot_label: slot?.slot_label ?? null,
     slot_image_url: slot?.slot_image_url ?? null,
   };
-}))}
-                      {/* approvedBookings={bookings.filter(b => b.status === 'approved').map(b => ({
-                        slot_number: b.slot_number,
-                        vtc_name: b.vtc_name,
-                         member_count: b.member_count,
-                      }))} */}
+}))
                     />
                     <WebhookSender
                       event={{
