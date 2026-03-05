@@ -58,10 +58,10 @@ const EventBooking = () => {
     try {
       const { data, error } = await supabase.functions.invoke('truckersmp-vtc-events');
       if (error) throw error;
-      
+
       const foundEvent = data.events?.find((e: TruckersMPEvent) => e.id.toString() === eventId);
       setEvent(foundEvent || null);
-      
+
       // Check if booking is enabled for this event
       if (eventId) {
         const { data: settings } = await supabase
@@ -80,7 +80,7 @@ const EventBooking = () => {
 
   const fetchSlots = async () => {
     if (!eventId) return;
-    
+
     try {
       // Fetch slots for this event
       const { data: slotsData, error: slotsError } = await supabase
@@ -108,11 +108,11 @@ const EventBooking = () => {
           member_count: b.member_count
         }))
         .sort((a, b) => a.slot_number - b.slot_number);
-      
+
       setApprovedBookings(approved);
       // Generate default slots if none exist (1-20)
       let processedSlots: Slot[] = [];
-      
+
       if (slotsData && slotsData.length > 0) {
         processedSlots = slotsData.map(slot => {
           const booking = bookingsData?.find(b => b.slot_number === slot.slot_number);
@@ -123,9 +123,9 @@ const EventBooking = () => {
             is_locked: slot.is_locked,
             locked_for: slot.locked_for,
             slot_image_url: slot.slot_image_url,
-            status: slot.is_locked ? 'booked' as const : 
-                   booking ? (booking.status === 'approved' ? 'booked' as const : 'pending' as const) : 
-                   'available' as const,
+            status: slot.is_locked ? 'booked' as const :
+              booking ? (booking.status === 'approved' ? 'booked' as const : 'pending' as const) :
+                'available' as const,
             booking: booking ? { vtc_name: booking.vtc_name, member_count: booking.member_count } : undefined
           };
         });
@@ -194,8 +194,16 @@ const EventBooking = () => {
     toast.success('Booking request submitted! Awaiting approval.');
   };
 
+  const parseEventTime = (dateString: string) => {
+    if (!dateString.includes('Z') && !dateString.includes('+') && !dateString.includes('T')) {
+      return new Date(dateString.replace(' ', 'T') + 'Z');
+    }
+    return new Date(dateString);
+  };
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    const date = parseEventTime(dateString);
+    return date.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -203,12 +211,21 @@ const EventBooking = () => {
     });
   };
 
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('en-US', {
+  const formatLocalTime = (dateString: string) => {
+    const date = parseEventTime(dateString);
+    return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      timeZoneName: 'short',
     });
+  };
+
+  const formatUTCTime = (dateString: string) => {
+    const date = parseEventTime(dateString);
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'UTC',
+    }) + ' UTC';
   };
 
   if (loading) {
@@ -237,10 +254,10 @@ const EventBooking = () => {
       </PageTransition>
     );
   }
-const getSlotLabel = (slotNumber: number) => {
-  const slot = slots.find(s => s.slot_number === slotNumber);
-  return slot?.slot_label ?? `Slot #${slotNumber}`;
-};
+  const getSlotLabel = (slotNumber: number) => {
+    const slot = slots.find(s => s.slot_number === slotNumber);
+    return slot?.slot_label ?? `Slot #${slotNumber}`;
+  };
   return (
     <PageTransition>
       <Layout>
@@ -256,15 +273,15 @@ const getSlotLabel = (slotNumber: number) => {
             <div className="glass-card rounded-2xl overflow-hidden mb-8">
               {event.banner && (
                 <div className="relative h-48 sm:h-64 md:h-80">
-                  <img 
-                    src={event.banner} 
+                  <img
+                    src={event.banner}
                     alt={event.name}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
                 </div>
               )}
-              
+
               <div className="p-6 sm:p-8 space-y-4">
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/90 text-primary-foreground">
@@ -286,7 +303,7 @@ const getSlotLabel = (slotNumber: number) => {
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Clock className="w-4 h-4 text-primary" />
-                    <span>{formatTime(event.start_at)}</span>
+                    <span className="truncate">Departure: {formatLocalTime(event.start_at)} ({formatUTCTime(event.start_at)})</span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4 text-primary" />
@@ -345,13 +362,13 @@ const getSlotLabel = (slotNumber: number) => {
                       </div>
                     </div>
                   ) : (
-                    <SlotGrid 
-                      slots={slots} 
+                    <SlotGrid
+                      slots={slots}
                       onSlotSelect={handleSlotSelect}
                       selectedSlot={selectedSlot}
                       eventBanner={event.banner}
                     />
-                        )}
+                  )}
 
                   {/* VTC Booked List */}
                   {approvedBookings.length > 0 && (
@@ -365,7 +382,7 @@ const getSlotLabel = (slotNumber: number) => {
                       </div>
                       <div className="grid gap-2">
                         {approvedBookings.map((booking) => (
-                          <div 
+                          <div
                             key={booking.slot_number}
                             className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/30"
                           >
@@ -391,15 +408,15 @@ const getSlotLabel = (slotNumber: number) => {
               <div className="lg:col-span-1">
                 <div className="glass-card rounded-2xl p-6 sm:p-8 sticky top-24">
                   <h2 className="font-display text-xl font-bold mb-4">
-                   {!bookingEnabled ? 'Bookings Closed' : showForm ? `Book Slot #${selectedSlot}` : 'Select a Slot'}
+                    {!bookingEnabled ? 'Bookings Closed' : showForm ? `Book Slot #${selectedSlot}` : 'Select a Slot'}
                   </h2>
-                  
+
                   {!bookingEnabled ? (
                     <p className="text-muted-foreground text-sm">
                       Slot bookings are currently closed for this event. Please check back later.
                     </p>
                   ) : showForm && selectedSlot ? (
-                    <BookingForm 
+                    <BookingForm
                       eventId={eventId!}
                       slotNumber={selectedSlot}
                       eventName={event.name}
