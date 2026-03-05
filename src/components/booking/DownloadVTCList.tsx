@@ -27,16 +27,15 @@ const DownloadVTCList = ({ eventName, approvedBookings }: DownloadVTCListProps) 
     if (approvedBookings.length === 0) return;
 
     const data = approvedBookings.map((b) => ({
-      'Slot #': b.slot_number,
-      'Slot Label': b.slot_label || '',
-      'VTC Name': b.vtc_name,
-      'Member Count': b.member_count,
-      'Contact Name': b.contact_name || '',
-      'Contact Email': b.contact_email || '',
-      'Discord ID': b.discord_id,
-      'Notes': b.notes || '',
-      'Booked At': new Date(b.created_at).toLocaleString('en-GB'),
-      'Slot Image URL': b.slot_image_url || '',
+      slot_number: b.slot_number,
+      vtc_name: b.vtc_name,
+      member_count: b.member_count,
+      discord_id: b.discord_id,
+      contact_name: b.contact_name || '',
+      contact_email: b.contact_email || '',
+      created_at: b.created_at,
+      slot_label: b.slot_label || '',
+      slot_image: b.slot_image_url || '',
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);

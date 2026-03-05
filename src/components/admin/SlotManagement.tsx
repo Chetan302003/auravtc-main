@@ -583,12 +583,12 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                             <button
                               onClick={() => openEditSlotDialog(num)}
                               className={`w-8 h-8 rounded text-xs font-medium transition-all ${isLocked
-                                  ? 'bg-purple-500/30 text-purple-400 border border-purple-500/50'
-                                  : isBooked
-                                    ? 'bg-red-500/30 text-red-400 border border-red-500/50'
-                                    : isPending
-                                      ? 'bg-yellow-500/30 text-yellow-400 border border-yellow-500/50'
-                                      : 'bg-green-500/30 text-green-400 border border-green-500/50 hover:bg-green-500/40'
+                                ? 'bg-purple-500/30 text-purple-400 border border-purple-500/50'
+                                : isBooked
+                                  ? 'bg-red-500/30 text-red-400 border border-red-500/50'
+                                  : isPending
+                                    ? 'bg-yellow-500/30 text-yellow-400 border border-yellow-500/50'
+                                    : 'bg-green-500/30 text-green-400 border border-green-500/50 hover:bg-green-500/40'
                                 }`}
                             >
                               {num}
@@ -674,17 +674,21 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                   <div className="flex items-center gap-2 flex-wrap">
                     <DownloadVTCList
                       eventName={selectedEvent?.name || 'Event'}
-                          approvedBookings={bookings.filter(b => b.status === 'approved').map(b => ({
+                      approvedBookings={bookings.filter(b => b.status === 'approved').map(b => {
+                        const matchedSlot = slots.find(s => s.slot_number === b.slot_number);
+                        return {
                           slot_number: b.slot_number,
                           vtc_name: b.vtc_name,
                           member_count: b.member_count,
+                          discord_id: b.discord_id,
                           contact_name: b.contact_name,
                           contact_email: b.contact_email,
-                          discord_id: b.discord_id,
+                          notes: b.notes,
                           created_at: b.created_at,
-                          slot_label: b.slot_label,
-                          slot_image_url: b.slot_image_url ?? null,
-                         }))}
+                          slot_label: matchedSlot?.slot_label ?? null,
+                          slot_image_url: matchedSlot?.slot_image_url ?? null,
+                        };
+                      })}
                     />
                     <WebhookSender
                       event={{
