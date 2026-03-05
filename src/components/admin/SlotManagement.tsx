@@ -680,7 +680,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
                           member_count: b.member_count,
                           contact_name: b.contact_name,
                           contact_email: b.contact_email,
-                          notes: b.notes,
+                          discord_id: b.discord_id,
                           created_at: b.created_at,
                           slot_label: b.slot_label,
                           slot_image_url: b.slot_image_url ?? null,
