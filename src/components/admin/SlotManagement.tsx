@@ -687,8 +687,7 @@ const SlotManagement = ({ isAdmin }: SlotManagementProps) => {
     created_at: b.created_at,
     slot_label: slot?.slot_label ?? null,
     slot_image_url: slot?.slot_image_url ?? null,
-  };
-}))
+}))}
                     />
                     <WebhookSender
                       event={{
