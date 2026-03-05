@@ -5,7 +5,11 @@ import * as XLSX from 'xlsx';
 interface ApprovedBooking {
   slot_number: number;
   vtc_name: string;
+  vtc_id?: number;
   member_count: number;
+  slot_image_url?: string | null;
+  discord_id?: string | null;
+  contact_name?: string | null;
 }
 
 interface DownloadVTCListProps {
@@ -20,7 +24,13 @@ const DownloadVTCList = ({ eventName, approvedBookings }: DownloadVTCListProps) 
     const data = approvedBookings.map((b) => ({
       'Slot #': b.slot_number,
       'VTC Name': b.vtc_name,
+      'VTC Link': b.vtc_id
+        ? `https://truckersmp.com/vtc/${b.vtc_id}`
+        : `https://truckersmp.com/vtc`,
       'Member Count': b.member_count,
+      'Contact Name': b.contact_name || '',
+      'Discord ID': b.discord_id || '',
+      'Slot Image URL': b.slot_image_url || '',
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);
