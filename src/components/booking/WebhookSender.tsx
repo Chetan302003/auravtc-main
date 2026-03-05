@@ -37,6 +37,10 @@ interface WebhookSenderProps {
   slots: Slot[];
 }
 
+// ── Replace with your actual Supabase project URL ──────────────────────────────
+const SUPABASE_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/discord-webhook`;
+// ──────────────────────────────────────────────────────────────────────────────
+
 const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
   const [open, setOpen] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState('');
@@ -58,9 +62,9 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
     setSending(true);
 
     const eventUrl = `https://truckersmp.com/events/${event.id}`;
-    const ticketUrl = `https://truckersmp.com/events/${event.id}`; // replace with actual ticket URL if available
+    const ticketUrl = `https://truckersmp.com/events/${event.id}`;
 
-    // Intro embed — matches Image 2 style
+    // ── Intro embed ────────────────────────────────────────────────────────────
     const introEmbed = {
       title: event.name,
       url: eventUrl,
@@ -89,36 +93,54 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
       },
     };
 
-    // Group slots by slot_label — preserving insertion order
-    const groups = new Map<string, { slots: Slot[]; imageUrl: string | null }>();
+    // ── Group slots by slot_image_url ──────────────────────────────────────────
+    const groups = new Map<string, { slots: Slot[]; imageUrl: string | null; labels: Set<string> }>();
 
     slots.forEach((s) => {
-      const label = s.slot_label || `Slot #${s.slot_number}`;
-      if (!groups.has(label)) {
-        groups.set(label, { slots: [], imageUrl: s.slot_image_url || event.banner || null });
+      const imageKey = s.slot_image_url || '__no_image__';
+      if (!groups.has(imageKey)) {
+        groups.set(imageKey, { slots: [], imageUrl: s.slot_image_url || null, labels: new Set() });
       }
-      groups.get(label)!.slots.push(s);
+      const group = groups.get(imageKey)!;
+      group.slots.push(s);
+      if (s.slot_label) group.labels.add(s.slot_label);
     });
 
+    // ── Build imageUrls list & slot embeds ─────────────────────────────────────
+    const imageUrls: { key: string; url: string }[] = [];
     const slotEmbeds: object[] = [];
+    let imageIndex = 0;
 
-    groups.forEach((group, label) => {
-      // Build bullet list matching Image 2: "• **[VTC Name](url)**" or "• Available"
+    groups.forEach((group) => {
+      const title =
+        group.labels.size > 0
+          ? Array.from(group.labels).join(' • ')
+          : group.slots.map((s) => `Slot #${s.slot_number}`).join(' • ');
+
       const vtcList = group.slots
         .map((s) => {
+          const slotPrefix = s.slot_label ? `**${s.slot_label}** — ` : `**Slot #${s.slot_number}** — `;
           if (s.is_locked && s.locked_for) {
-            // Locked slot — bold name, link to TruckersMP search or VTC page
-            return `• **[${s.locked_for}](https://truckersmp.com/vtc)** *(Reserved)*`;
+            return `${slotPrefix}**[${s.locked_for}](https://truckersmp.com/vtc)** *(Reserved)*`;
           } else if (s.status === 'booked' && s.booking) {
             const vtcUrl = s.booking.vtc_id
               ? `https://truckersmp.com/vtc/${s.booking.vtc_id}`
               : `https://truckersmp.com/vtc`;
-            return `• **[${s.booking.vtc_name}](${vtcUrl})**`;
+            return `${slotPrefix}**[${s.booking.vtc_name}](${vtcUrl})**`;
           } else {
-            return `• Available`;
+            return `${slotPrefix}Available`;
           }
         })
         .join('\n');
+
+      // Register image as an attachment
+      let imageField: object | undefined = undefined;
+      if (group.imageUrl) {
+        const key = `image_${imageIndex}`;
+        imageUrls.push({ key, url: group.imageUrl });
+        imageField = { url: `attachment://${key}.png` };
+        imageIndex++;
+      }
 
       slotEmbeds.push({
         author: {
@@ -126,30 +148,43 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
           icon_url: event.banner || undefined,
           url: eventUrl,
         },
-        title: label,
+        title,
         description: vtcList,
         color: 0x1f8b4c,
-        image: group.imageUrl ? { url: group.imageUrl } : undefined,
+        image: imageField,
       });
     });
 
-    // Combine intro + slot embeds; Discord allows max 10 per message
+    // ── Chunk embeds (max 10 per Discord message) ──────────────────────────────
     const allEmbeds = [introEmbed, ...slotEmbeds];
-    const chunks: object[][] = [];
+    const chunks: { embeds: object[]; imageUrls: { key: string; url: string }[] }[] = [];
+
     for (let i = 0; i < allEmbeds.length; i += 10) {
-      chunks.push(allEmbeds.slice(i, i + 10));
+      const chunkEmbeds = allEmbeds.slice(i, i + 10);
+      const chunkImages = imageUrls.filter(({ key }) =>
+        chunkEmbeds.some((e: any) => e.image?.url === `attachment://${key}.png`)
+      );
+      chunks.push({ embeds: chunkEmbeds, imageUrls: chunkImages });
     }
 
     try {
       for (const chunk of chunks) {
-        const res = await fetch(webhookUrl, {
+        const res = await fetch(SUPABASE_FUNCTION_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ embeds: chunk }),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            webhookUrl,
+            embeds: chunk.embeds,
+            imageUrls: chunk.imageUrls,
+          }),
         });
 
-        if (!res.ok && res.status !== 0) {
-          throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err);
         }
 
         if (chunks.length > 1) {
@@ -182,7 +217,7 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
         </DialogHeader>
         <div className="space-y-4 pt-2">
           <p className="text-sm text-muted-foreground">
-            Enter a Discord webhook URL to post the full slot list with VTC links, section images, and booking status.
+            Enter a Discord webhook URL to post the full slot list with full-size section images.
           </p>
           <div className="space-y-2">
             <Label htmlFor="webhook-url">Webhook URL</Label>
@@ -198,9 +233,9 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
             <p className="font-medium text-foreground text-sm">Payload format: Discord Embeds</p>
             <ul className="list-disc list-inside space-y-0.5">
               <li>Intro embed with event info &amp; ticket instructions</li>
-              <li>Section embeds grouped by slot label</li>
-              <li>VTC names as bold hyperlinks (• <strong>VTC Name</strong>)</li>
-              <li>Slot preview images included per section</li>
+              <li>Section embeds grouped by shared slot image</li>
+              <li>VTC names as bold hyperlinks</li>
+              <li>Images sent as full-size attachments via Supabase Edge Function</li>
             </ul>
           </div>
 
@@ -229,7 +264,6 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
 };
 
 export default WebhookSender;
-
 
 
 // import { useState } from 'react';
