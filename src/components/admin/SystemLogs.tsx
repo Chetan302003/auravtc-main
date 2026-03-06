@@ -9,6 +9,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from 'sonner';
 
 interface SystemLog {
@@ -636,16 +643,17 @@ const SystemLogs = ({ isAdmin, canDelete = false }: SystemLogsProps) => {
             </div>
 
             {/* Source filter */}
-            <select
-              value={sourceFilter}
-              onChange={(e) => setSourceFilter(e.target.value)}
-              className="px-2 py-1 text-[10px] sm:text-xs rounded-lg border border-border/30 bg-secondary/30 text-foreground"
-            >
-              <option value="all">All Sources</option>
-              {sources.map(source => (
-                <option key={source} value={source}>{source}</option>
-              ))}
-            </select>
+            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <SelectTrigger className="w-[140px] sm:w-[160px] h-[26px] sm:h-7 px-2 py-1 text-[10px] sm:text-xs rounded-lg border border-border/30 bg-secondary/30 text-foreground">
+                <SelectValue placeholder="All Sources" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                <SelectItem value="all">All Sources</SelectItem>
+                {sources.map(source => (
+                  <SelectItem key={source} value={source}>{source}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* Level filter buttons */}
             <div className="flex rounded-lg border border-border/30 overflow-hidden">
