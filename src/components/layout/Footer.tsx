@@ -7,7 +7,7 @@ const Footer = () => {
     <footer className="relative bg-card border-t border-border/50">
       {/* Glow effect at top */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
-      
+
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -53,9 +53,9 @@ const Footer = () => {
               {['Home', 'Team', 'Events', 'Apply'].map((link) => (
                 <li key={link}>
                   <Link
-                    
-                     to={link === 'Home' ? '/' : `/${link.toLowerCase()}`}
-                  
+
+                    to={link === 'Home' ? '/' : `/${link.toLowerCase()}`}
+
                     className="text-muted-foreground hover:text-primary transition-colors duration-300"
                   >
                     {link}
@@ -67,32 +67,32 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-  <h4 className="font-display font-semibold text-foreground mb-4">Resources</h4>
-  <ul className="space-y-2">
-    {['Server Status', 'Contact', 'TruckersMP'].map((link) => (
-      <li key={link}>
-        {link === 'TruckersMP' ? (
-          <a
-            href="https://truckersmp.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary transition-colors duration-300"
-          >
-            {link}
-          </a>
-        ) : (
-          <Link
-            /* FIX: Convert 'Server Status' to 'server-status' and 'Contact' to 'contact' */
-            to={`/${link.toLowerCase().replace(' ', '-')}`}
-            className="text-muted-foreground hover:text-primary transition-colors duration-300"
-          >
-            {link}
-          </Link>
-        )}
-      </li>
-    ))}
-  </ul>
-</div>
+            <h4 className="font-display font-semibold text-foreground mb-4">Resources</h4>
+            <ul className="space-y-2">
+              {['Server Status', 'Contact', 'TruckersMP'].map((link) => (
+                <li key={link}>
+                  {link === 'TruckersMP' ? (
+                    <a
+                      href="https://truckersmp.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300"
+                    >
+                      {link}
+                    </a>
+                  ) : (
+                    <Link
+                      /* FIX: Convert 'Server Status' to 'server-status' and 'Contact' to 'contact' */
+                      to={`/${link.toLowerCase().replace(' ', '-')}`}
+                      className="text-muted-foreground hover:text-primary transition-colors duration-300"
+                    >
+                      {link}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
           {/* <div>
             <h4 className="font-display font-semibold text-foreground mb-4">Resources</h4>
             <ul className="space-y-2">
@@ -117,18 +117,30 @@ const Footer = () => {
           <p className="text-muted-foreground text-sm">
             © {new Date().getFullYear()} Aura VTC. All rights reserved.
           </p>
-<p className="text-muted-foreground text-sm flex items-center gap-1">
-  Built by 
-  <a 
-    href="https://truckersmp.com/user/5936847" // Replace with your actual link
-    target="_blank" 
-    rel="noopener noreferrer"
-    className="text-primary font-semibold hover:underline"
-  >
-    Chetan
-  </a> 
-  <Heart className="w-4 h-4 text-primary fill-primary" />
-</p>
+
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+            <div className="flex items-center gap-4">
+              <Link to="/terms-of-service" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Terms of Service
+              </Link>
+              <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Privacy Policy
+              </Link>
+            </div>
+
+            <p className="text-muted-foreground text-sm flex items-center gap-1">
+              Built by
+              <a
+                href="https://truckersmp.com/user/5936847"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary font-semibold hover:underline"
+              >
+                Chetan
+              </a>
+              <Heart className="w-4 h-4 text-primary fill-primary" />
+            </p>
+          </div>
         </div>
       </div>
     </footer>
