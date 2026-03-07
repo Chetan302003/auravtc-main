@@ -45,7 +45,7 @@ const TermsOfService = () => {
                             <h3 className="text-xl font-semibold text-foreground mt-6 mb-2">Game Requirements</h3>
                             <p className="mb-2">Each applicant must have a minimum of 50 hours combined gameplay in:</p>
                             <ul className="list-disc pl-6 space-y-1 mb-6">
-                                <li>Euro Truck Simulator 2 (ETS2), or</li>
+                                <li>Euro Truck Simulator 2 (ETS2)</li>
                                 <li>American Truck Simulator (ATS)</li>
                             </ul>
 
@@ -159,7 +159,6 @@ const TermsOfService = () => {
                                 <li>Booking information</li>
                                 <li>Event participation records</li>
                             </ul>
-                            <p>For full details, please refer to our <Link to="/privacy-policy" className="text-primary hover:underline font-semibold">Privacy Policy</Link>.</p>
                         </section>
 
                         <section>
