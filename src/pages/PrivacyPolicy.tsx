@@ -16,6 +16,7 @@ const PrivacyPolicy = () => {
 
                     <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">Aura VTC Privacy Policy</h1>
                     <p className="text-primary font-semibold mb-8">Effective Date: 15/02/2026</p>
+                    <p> className="text-primary font-semibold mb-8">Last Updated: 18/02/2026</p>
 
                     <div className="space-y-8 text-muted-foreground leading-relaxed">
                         <p>
