@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
 import Index from "./pages/Index";
+import Hub from "./pages/Hub";
 import Team from "./pages/Team";
 import Events from "./pages/Events";
 import Apply from "./pages/Apply";
@@ -33,6 +34,7 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Index />} />
+        <Route path="/hub" element={<Hub />} />
         <Route path="/team" element={<Team />} />
         <Route path="/events" element={<Events />} />
         <Route path="/events/:eventId/book" element={<EventBooking />} />
