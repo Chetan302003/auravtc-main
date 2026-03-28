@@ -12,6 +12,7 @@ const navItems = [
   { path: '/apply', label: 'Apply', icon: FileText },
   { path: '/gallery', label: 'Gallery', icon: Image },
   { path: '/server-status', label: 'Server Status', icon: Server },
+  { path: '/hub', label: 'Hub', icon: LayoutDashboard },
   { path: '/contact', label: 'Contact', icon: Mail },
 ];
 
