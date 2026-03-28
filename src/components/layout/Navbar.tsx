@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Users, Calendar, FileText, Server, Mail, Shield, Image } from 'lucide-react';
+import { Menu, X, Home, Users, Calendar, FileText, Server, Mail, Shield, Image, LayoutDashboard} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import logo from '@/assets/logo.png';
