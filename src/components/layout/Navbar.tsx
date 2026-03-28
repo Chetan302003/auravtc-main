@@ -7,12 +7,12 @@ import logo from '@/assets/logo.png';
 
 const navItems = [
   { path: '/', label: 'Home', icon: Home },
+  { path: '/hub', label: 'Hub', icon: LayoutDashboard },
   { path: '/team', label: 'Our Team', icon: Users },
   { path: '/events', label: 'Events', icon: Calendar },
   { path: '/apply', label: 'Apply', icon: FileText },
   { path: '/gallery', label: 'Gallery', icon: Image },
   { path: '/server-status', label: 'Server Status', icon: Server },
-  { path: '/hub', label: 'Hub', icon: LayoutDashboard },
   { path: '/contact', label: 'Contact', icon: Mail },
 ];
 
