@@ -103,34 +103,40 @@ const Hub = () => {
     fetchLatestRelease();
   }, []);
 
-  // Fetch initial data + Realtime subscription — uses isolated hubSupabase client
-  useEffect(() => {
-    const fetchInitial = async () => {
-      const { data, error } = await hubSupabase
-        .from('hub_broadcast')
-        .select('fleet_stats, leaderboard, last_updated')
-        .eq('id', 1)
-        .single();
+// Fetch initial data + Realtime subscription
+useEffect(() => {
+  const fetchInitial = async () => {
+    // Fleet stats row
+    const { data: statsRow } = await hubSupabase
+      .from('hub_broadcast')
+      .select('*')
+      .eq('type', 'fleet_stats')
+      .single();
 
-      if (!error && data) setBroadcast(data as HubBroadcast);
-      setLoading(false);
-    };
+    // Leaderboard rows — ordered by distance
+    const { data: leaderboardRows } = await hubSupabase
+      .from('hub_broadcast')
+      .select('*')
+      .eq('type', 'leaderboard')
+      .order('total_distance', { ascending: false });
 
-    fetchInitial();
+    if (statsRow)      setFleetStats(statsRow);
+    if (leaderboardRows) setLeaderboard(leaderboardRows);
+    setLoading(false);
+  };
 
-    const channel = hubSupabase
-      .channel('hub-broadcast')
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'hub_broadcast' },
-        (payload) => {
-          setBroadcast(payload.new as HubBroadcast);
-        }
-      )
-      .subscribe();
+  fetchInitial();
 
-    return () => { hubSupabase.removeChannel(channel); };
-  }, []);
+  const channel = hubSupabase
+    .channel('hub-broadcast')
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'hub_broadcast' },
+      () => { fetchInitial(); } // re-fetch on any change
+    )
+    .subscribe();
+
+  return () => { hubSupabase.removeChannel(channel); };
+}, []);
 
   const stats = broadcast?.fleet_stats;
   const leaderboard = broadcast?.leaderboard ?? [];
