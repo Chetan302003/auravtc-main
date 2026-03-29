@@ -333,10 +333,11 @@ const Hub = () => {
                           <div className="absolute inset-0 rounded-full bg-primary/20 blur opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                         <div>
-                          <p className="text-white font-bold text-lg">{driver.username}</p>
-                            <span className="text-white font-bold">{fmtCurrency(driver.total_earnings)}</span>
-                             <span className="text-emerald-400"> earned</span>
-                          </p>
+                           <p className="text-white font-bold text-lg">{driver.username}</p>
+                            <p className=" text-primary text-[10px] uppercase tracking-tighter font-display">
+                              <span className="text-white font-bold">{fmtCurrency(driver.total_earnings)}</span>
+                               <span className="text-emerald-400"> earned</span>
+                            </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-12">
