@@ -336,7 +336,7 @@ const Hub = () => {
                            <p className="text-white font-bold text-lg">{driver.username}</p>
                             <p className=" text-primary text-[10px] uppercase tracking-tighter font-display">
                               <span className="text-white font-bold">{fmtCurrency(driver.total_earnings)}</span>
-                               <span className="text-emerald-400"> earned</span>
+                               <span className="text-emerald-400 ml-1"> earned</span>
                             </p>
                         </div>
                       </div>
