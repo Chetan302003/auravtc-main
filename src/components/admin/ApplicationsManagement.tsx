@@ -121,74 +121,168 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
   };
 
   const handleAccept = async (application: Application) => {
-    setActionLoading(`accept-${application.id}`);
-    try {
-      // Call the edge function to handle Discord notification
-      const { error: fnError } = await supabase.functions.invoke('aura-hr-handler', {
-        body: {
-          action: 'accept',
+  setActionLoading(`accept-${application.id}`);
+  try {
+    const res = await fetch(
+      `${supabase.supabaseUrl}/functions/v1/aura-hr-handler`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabase.supabaseKey,
+          "Authorization": `Bearer ${supabase.supabaseKey}`,
+        },
+        body: JSON.stringify({
+          action: "accept",
           application_id: application.id,
           discord_id: application.discord_id,
           name: application.name,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to accept");
+    }
+
+    setApplications(prev =>
+      prev.map(app =>
+        app.id === application.id
+          ? { ...app, status: 'accepted', reviewed_at: new Date().toISOString() }
+          : app
+      )
+    );
+
+    toast.success(`Application from ${application.name} accepted`);
+    setIsDetailsDialogOpen(false);
+  } catch (err: any) {
+    toast.error(err.message || 'Failed to accept application');
+  } finally {
+    setActionLoading(null);
+  }
+};
+
+const handleReject = async () => {
+  if (!selectedApplication) return;
+  if (!rejectionReason.trim()) {
+    toast.error('Please provide a rejection reason');
+    return;
+  }
+
+  setActionLoading(`reject-${selectedApplication.id}`);
+  try {
+    const res = await fetch(
+      `${supabase.supabaseUrl}/functions/v1/aura-hr-handler`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabase.supabaseKey,
+          "Authorization": `Bearer ${supabase.supabaseKey}`,
         },
-      });
-
-      if (fnError) throw fnError;
-
-      // Update local state
-      setApplications(prev =>
-        prev.map(app =>
-          app.id === application.id
-            ? { ...app, status: 'accepted', reviewed_at: new Date().toISOString() }
-            : app
-        )
-      );
-
-      toast.success(`Application from ${application.name} accepted`);
-      setIsDetailsDialogOpen(false);
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to accept application');
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleReject = async () => {
-    if (!selectedApplication) return;
-
-    if (!rejectionReason.trim()) {
-      toast.error('Please provide a rejection reason');
-      return;
-    }
-
-    setActionLoading(`reject-${selectedApplication.id}`);
-    try {
-      // Call the edge function to handle Discord notification
-      const { error: fnError } = await supabase.functions.invoke('aura-hr-handler', {
-        body: {
-          action: 'reject',
+        body: JSON.stringify({
+          action: "reject",
           application_id: selectedApplication.id,
           discord_id: selectedApplication.discord_id,
           name: selectedApplication.name,
           reason: rejectionReason,
-        },
-      });
+        }),
+      }
+    );
 
-      if (fnError) throw fnError;
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to reject");
+    }
 
-      // Update local state
-      setApplications(prev =>
-        prev.map(app =>
-          app.id === selectedApplication.id
-            ? {
-              ...app,
-              status: 'rejected',
-              rejection_reason: rejectionReason,
-              reviewed_at: new Date().toISOString()
-            }
-            : app
-        )
-      );
+    setApplications(prev =>
+      prev.map(app =>
+        app.id === selectedApplication.id
+          ? { ...app, status: 'rejected', rejection_reason: rejectionReason, reviewed_at: new Date().toISOString() }
+          : app
+      )
+    );
+
+    toast.success(`Application from ${selectedApplication.name} rejected`);
+    setIsRejectDialogOpen(false);
+    setIsDetailsDialogOpen(false);
+    setRejectionReason('');
+  } catch (err: any) {
+    toast.error(err.message || 'Failed to reject application');
+  } finally {
+    setActionLoading(null);
+  }
+};
+  // const handleAccept = async (application: Application) => {
+  //   setActionLoading(`accept-${application.id}`);
+  //   try {
+  //     // Call the edge function to handle Discord notification
+  //     const { error: fnError } = await supabase.functions.invoke('aura-hr-handler', {
+  //       body: {
+  //         action: 'accept',
+  //         application_id: application.id,
+  //         discord_id: application.discord_id,
+  //         name: application.name,
+  //       },
+  //     });
+
+  //     if (fnError) throw fnError;
+
+  //     // Update local state
+  //     setApplications(prev =>
+  //       prev.map(app =>
+  //         app.id === application.id
+  //           ? { ...app, status: 'accepted', reviewed_at: new Date().toISOString() }
+  //           : app
+  //       )
+  //     );
+
+  //     toast.success(`Application from ${application.name} accepted`);
+  //     setIsDetailsDialogOpen(false);
+  //   } catch (err: any) {
+  //     toast.error(err.message || 'Failed to accept application');
+  //   } finally {
+  //     setActionLoading(null);
+  //   }
+  // };
+
+  // const handleReject = async () => {
+  //   if (!selectedApplication) return;
+
+  //   if (!rejectionReason.trim()) {
+  //     toast.error('Please provide a rejection reason');
+  //     return;
+  //   }
+
+  //   setActionLoading(`reject-${selectedApplication.id}`);
+  //   try {
+  //     // Call the edge function to handle Discord notification
+  //     const { error: fnError } = await supabase.functions.invoke('aura-hr-handler', {
+  //       body: {
+  //         action: 'reject',
+  //         application_id: selectedApplication.id,
+  //         discord_id: selectedApplication.discord_id,
+  //         name: selectedApplication.name,
+  //         reason: rejectionReason,
+  //       },
+  //     });
+
+  //     if (fnError) throw fnError;
+
+  //     // Update local state
+  //     setApplications(prev =>
+  //       prev.map(app =>
+  //         app.id === selectedApplication.id
+  //           ? {
+  //             ...app,
+  //             status: 'rejected',
+  //             rejection_reason: rejectionReason,
+  //             reviewed_at: new Date().toISOString()
+  //           }
+  //           : app
+  //       )
+  //     );
 
       toast.success(`Application from ${selectedApplication.name} rejected`);
       setIsRejectDialogOpen(false);
