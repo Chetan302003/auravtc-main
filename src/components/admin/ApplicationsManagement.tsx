@@ -284,16 +284,16 @@ const handleReject = async () => {
   //       )
   //     );
 
-      toast.success(`Application from ${selectedApplication.name} rejected`);
-      setIsRejectDialogOpen(false);
-      setIsDetailsDialogOpen(false);
-      setRejectionReason('');
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to reject application');
-    } finally {
-      setActionLoading(null);
-    }
-  };
+  //     toast.success(`Application from ${selectedApplication.name} rejected`);
+  //     setIsRejectDialogOpen(false);
+  //     setIsDetailsDialogOpen(false);
+  //     setRejectionReason('');
+  //   } catch (err: any) {
+  //     toast.error(err.message || 'Failed to reject application');
+  //   } finally {
+  //     setActionLoading(null);
+  //   }
+  // };
 
   const openDetailsDialog = (application: Application) => {
     setSelectedApplication(application);
