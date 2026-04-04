@@ -137,6 +137,7 @@ const ApplicationsManagement = ({ isAdmin }: ApplicationsManagementProps) => {
           application_id: application.id,
           discord_id: application.discord_id,
           name: application.name,
+          reviewed_by: "Website Admin",
         }),
       }
     );
@@ -187,6 +188,7 @@ const handleReject = async () => {
           discord_id: selectedApplication.discord_id,
           name: selectedApplication.name,
           reason: rejectionReason,
+          reviewed_by: "Website Admin",
         }),
       }
     );
