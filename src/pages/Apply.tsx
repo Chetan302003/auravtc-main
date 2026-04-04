@@ -44,10 +44,15 @@ const handleSubmit = async (e: React.FormEvent) => {
   setIsSubmitting(true);
 
   try {
-const { error } = await supabase.functions.invoke(
-  "aura-hr-handler",
+    // ✅ NEW — plain fetch, no auth headers attached
+const res = await fetch(
+  "https://paxmnwccxoftmnhvrlxk.supabase.co/functions/v1/aura-hr-handler",
   {
-    body: {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
       action: "apply",
       name: formData.name,
       truckermp_id: formData.truckersMPId,
@@ -55,14 +60,34 @@ const { error } = await supabase.functions.invoke(
       age: formData.age,
       experience: formData.experience,
       reason: formData.reason,
-    },
+    }),
   }
 );
 
-    if (error) {
-      console.error("Edge Function error:", error);
-      throw error;
-    }
+if (!res.ok) {
+  const errBody = await res.json().catch(() => ({}));
+  console.error("Edge Function error:", errBody);
+  throw new Error(errBody.error || "Request failed");
+}
+// const { error } = await supabase.functions.invoke(
+//   "aura-hr-handler",
+//   {
+//     body: {
+//       action: "apply",
+//       name: formData.name,
+//       truckermp_id: formData.truckersMPId,
+//       discord_id: formData.discordId,
+//       age: formData.age,
+//       experience: formData.experience,
+//       reason: formData.reason,
+//     },
+//   }
+// );
+
+//     if (error) {
+//       console.error("Edge Function error:", error);
+//       throw error;
+//     }
 
     toast({
       title: "Application Submitted!",
