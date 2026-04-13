@@ -69,15 +69,21 @@ const PartnersSection = () => {
 
     const scrollContainer = scrollRef.current;
     let animationId: number;
-    let scrollPosition = 0;
+    let scrollPosition = scrollContainer.scrollLeft;
     const scrollSpeed = 0.5;
+    
+    // Exact same copy count used below for rendering
+    const repeatCount = Math.max(4, Math.ceil(30 / partners.length));
 
     const animate = () => {
       scrollPosition += scrollSpeed;
       
-      // Reset when reaching half (since we duplicate the content)
-      if (scrollPosition >= scrollContainer.scrollWidth / 2) {
-        scrollPosition = 0;
+      // Calculate exactly how wide a single original list of partners is
+      const singleCopyWidth = scrollContainer.scrollWidth / repeatCount;
+      
+      // Reset when scrolling past the first full copy to create a seamless loop
+      if (scrollPosition >= singleCopyWidth) {
+        scrollPosition -= singleCopyWidth;
       }
       
       scrollContainer.scrollLeft = scrollPosition;
@@ -147,8 +153,9 @@ const PartnersSection = () => {
     );
   }
 
-  // Duplicate partners for infinite scroll effect
-  const duplicatedPartners = [...partners, ...partners];
+  // Calculate enough duplicates to overflow the window and then some
+  const repeatCount = Math.max(4, Math.ceil(30 / partners.length));
+  const duplicatedPartners = Array(repeatCount).fill(partners).flat();
 
   return (
     <section id="partners" className="py-16 bg-background/50 relative overflow-hidden">
