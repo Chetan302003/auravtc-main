@@ -24,6 +24,7 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import SmoothScroll from "./components/layout/SmoothScroll";
 import Preloader from "./components/layout/Preloader";
+import CookieBanner from "./components/layout/CookieBanner";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
         <SmoothScroll />
         <BrowserRouter>
           <AnimatedRoutes />
+          <CookieBanner />
         </BrowserRouter>
         <SpeedInsights />
         <Analytics />
