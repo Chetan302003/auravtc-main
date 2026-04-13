@@ -269,10 +269,11 @@
 
 /* Particle background effect */
 .particles {
-  position: absolute;
+  position: fixed;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  z-index: 0;
 }
 
 .particle {
@@ -288,11 +289,11 @@
 @keyframes particle-float {
   0%, 100% {
     transform: translate(0, 0) scale(1);
-    opacity: 0.3;
+    opacity: 0.2;
   }
   50% {
-    transform: translate(20px, -30px) scale(1.5);
-    opacity: 0.6;
+    transform: translate(var(--tx, 30px), var(--ty, -50px)) scale(1.5);
+    opacity: 0.8;
   }
 }
 
