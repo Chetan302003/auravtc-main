@@ -131,7 +131,7 @@ const Footer = () => {
             <p className="text-muted-foreground text-sm flex items-center gap-1">
               Built by
               <a
-                href="https://truckersmp.com/user/5936847"
+                href="https://chetanmahajan.vercel.app"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary font-semibold hover:underline"
