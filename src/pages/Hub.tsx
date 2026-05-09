@@ -185,8 +185,7 @@ const Hub = () => {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="font-display text-5xl md:text-8xl font-black tracking-tighter mb-6 leading-none"
             >
-              <span className="text-foreground">AURA VTC</span>{' '}
-              <span className="text-primary glow-text-strong">HUB</span>
+              <span className="text-foreground">AURA VTC HUB </span>
             </motion.h1>
 
             <motion.p
