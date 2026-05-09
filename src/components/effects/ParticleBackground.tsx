@@ -7,7 +7,7 @@ const ParticleBackground = () => {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    const particleCount = 50;
+    const particleCount =40 ;
 
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
