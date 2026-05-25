@@ -166,7 +166,7 @@ const Hub = () => {
           <section className="flex flex-col items-center text-center mb-32 relative">
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
@@ -177,7 +177,7 @@ const Hub = () => {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
               </span>
               ⚡ Powered by Rust + Tauri
-            </motion.div>
+            </motion.div> */}
 
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
