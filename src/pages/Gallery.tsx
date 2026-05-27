@@ -50,45 +50,40 @@ const Gallery = () => {
     }
   };
 
-  const getVideoEmbedUrl = (url: string): string | null => {
-    // Google Drive embed
-    if (url.includes('drive.google.com')) {
-      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match) {
-        return `https://drive.google.com/file/d/${match[1]}/preview`;
-      }
-    }
-    // YouTube embed
-    if (url.includes('youtube.com') || url.includes('youtu.be')) {
-      const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
-      if (match) {
-        return `https://www.youtube.com/embed/${match[1]}?autoplay=1&mute=1`;
-      }
-    }
-    // Terabox embed - extract share ID and create embed URL
-    if (url.includes('terabox.com') || url.includes('teraboxapp.com') || url.includes('1024terabox.com')) {
-      // Handle various terabox URL formats
-      const shareMatch = url.match(/\/s\/([a-zA-Z0-9_-]+)/);
-      if (shareMatch) {
-        return `https://www.terabox.com/sharing/embed?surl=${shareMatch[1]}`;
-      }
-      // Direct video link
-      return url;
-    }
+const getVideoEmbedUrl = (url: string): string | null => {
+  const host = parseHost(url);
+  if (!host) return null;
+
+  if (host === 'drive.google.com') {
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match) return `https://drive.google.com/file/d/${match[1]}/preview`;
+  }
+
+  if (host === 'youtube.com' || host === 'www.youtube.com' || host === 'youtu.be') {
+    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+    if (match) return `https://www.youtube.com/embed/${match[1]}?autoplay=1&mute=1`;
+  }
+
+  if (host === 'terabox.com' || host === 'www.terabox.com' ||
+      host === 'teraboxapp.com' || host === '1024terabox.com') {
+    const shareMatch = url.match(/\/s\/([a-zA-Z0-9_-]+)/);
+    if (shareMatch) return `https://www.terabox.com/sharing/embed?surl=${shareMatch[1]}`;
     return url;
-  };
+  }
 
-  const getVideoThumbnail = (url: string): string | null => {
-    // YouTube thumbnail
-    if (url.includes('youtube.com') || url.includes('youtu.be')) {
-      const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
-      if (match) {
-        return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
-      }
-    }
-    return null;
-  };
+  return url;
+};
 
+const getVideoThumbnail = (url: string): string | null => {
+  const host = parseHost(url);
+  if (!host) return null;
+
+  if (host === 'youtube.com' || host === 'www.youtube.com' || host === 'youtu.be') {
+    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+    if (match) return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
+  }
+  return null;
+};
   return (
     <PageTransition>
       <Layout>
