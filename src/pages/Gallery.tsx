@@ -49,7 +49,10 @@ const Gallery = () => {
       setLoading(false);
     }
   };
-
+const parseHost = (url: string): string | null => {
+    try { return new URL(url).hostname; }
+    catch { return null; }
+  };
 const getVideoEmbedUrl = (url: string): string | null => {
   const host = parseHost(url);
   if (!host) return null;
