@@ -29,12 +29,17 @@ interface SlotGridProps {
 const convertToDirectImageUrl = (url: string): string => {
   if (!url) return '';
 
-  // Handle Google Drive links
-  if (url.includes('drive.google.com')) {
-    const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileIdMatch) {
-      return `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w800`;
+  try {
+    const host = new URL(url).hostname;
+
+    if (host === 'drive.google.com') {
+      const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w800`;
+      }
     }
+  } catch {
+    return url; // Invalid URL, return as-is
   }
 
   // Return original URL for ImageBB and other direct links
