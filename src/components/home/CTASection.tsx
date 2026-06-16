@@ -38,7 +38,7 @@ const CTASection = () => {
           </h2>
 
           <p className="text-xl text-muted-foreground max-w-xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            Become part of our growing family. Apply now and start your journey with Aura VTC on TruckersMP.
+            Become part of our growing family. Apply now and start your journey with Meth VTC on TruckersMP.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-scale-in" style={{ animationDelay: '0.4s' }}>

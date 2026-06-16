@@ -13,14 +13,14 @@ const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-4">
-              <img src={logo} alt="Aura VTC" className="h-12 w-12 rounded-full" />
+              <img src={logo} alt="Meth VTC" className="h-12 w-12 rounded-full" />
               <span className="font-display font-bold text-xl">
-                <span className="text-foreground">AURA</span>
+                <span className="text-foreground">METH</span>
                 <span className="text-primary"> VTC</span>
               </span>
             </Link>
             <p className="text-muted-foreground max-w-md mb-4">
-              Experience the thrill of virtual trucking with Aura VTC. Join our community of professional drivers on TruckersMP and embark on an extraordinary journey across Europe and beyond.
+              Experience the thrill of virtual trucking with Meth VTC. Join our community of professional drivers on TruckersMP and embark on an extraordinary journey across Europe and beyond.
             </p>
             <div className="flex gap-4">
               <a
@@ -115,7 +115,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-border/30 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Aura VTC. All rights reserved.
+            © {new Date().getFullYear()} Meth VTC. All rights reserved.
           </p>
 
           <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">

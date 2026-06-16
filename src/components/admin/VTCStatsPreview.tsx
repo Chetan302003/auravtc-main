@@ -30,7 +30,7 @@ const VTCStatsPreview = ({ settings }: VTCStatsPreviewProps) => {
             <span className="text-foreground">Our </span>
             <span className="text-primary glow-text">Statistics</span>
           </h3>
-          <p className="text-xs text-muted-foreground">Aura VTC achievements</p>
+          <p className="text-xs text-muted-foreground">Meth VTC achievements</p>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">

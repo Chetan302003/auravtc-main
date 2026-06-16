@@ -129,7 +129,7 @@ const Team = () => {
                 <span className="text-primary glow-text">Team</span>
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-                The dedicated individuals who make Aura VTC the best it can be
+                The dedicated individuals who make Meth VTC the best it can be
               </p>
               <div className="neon-line max-w-xs mx-auto" />
             </div>

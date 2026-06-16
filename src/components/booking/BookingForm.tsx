@@ -151,7 +151,7 @@ const BookingForm = ({ eventId, slotNumber, eventName, eventSlug, eventBanner, o
               Please join our Discord server for a quicker response and real-time updates on your booking status.
             </p>
             <a
-              href="https://discord.com/invite/auravtc"
+              href=""
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 mt-2 text-xs font-medium text-primary hover:underline"

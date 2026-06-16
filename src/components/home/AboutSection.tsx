@@ -38,7 +38,7 @@ const AboutSection = () => {
         <div className="text-center mb-16 space-y-4 animate-slide-up">
           <h2 className="font-display text-4xl md:text-5xl font-bold">
             <span className="text-foreground">Welcome to </span>
-            <span className="text-primary glow-text">AURA VTC</span>
+            <span className="text-primary glow-text">METH VTC</span>
           </h2>
           <div className="neon-line max-w-xs mx-auto animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
         </div>
@@ -49,7 +49,7 @@ const AboutSection = () => {
             <div className="glass-card rounded-2xl p-8 space-y-4 hover:glow-border transition-all duration-500 hover:-translate-y-1">
               <h3 className="font-display text-2xl font-semibold text-primary animate-pulse-glow inline-block">Our Mission</h3>
               <p className="text-muted-foreground leading-relaxed">
-                🎮 We are proud to bring you an exceptional virtual trucking experience. Aura VTC represents the pinnacle of professional trucking on TruckersMP, where skill meets community.
+                🎮 We are proud to bring you an exceptional virtual trucking experience. Meth VTC represents the pinnacle of professional trucking on TruckersMP, where skill meets community.
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 🎮 Our drivers embody unity, professionalism, and dedication. We ensure that every member feels valued and every journey is memorable.
@@ -85,7 +85,7 @@ const AboutSection = () => {
         {/* Why Join Us */}
         <div className="glass-card rounded-3xl p-8 md:p-12 animate-slide-up hover:glow-border transition-all duration-500" style={{ animationDelay: '0.4s' }}>
           <h3 className="font-display text-3xl font-bold text-center mb-8">
-            Why Choose <span className="text-primary animate-pulse-glow">Aura VTC</span>?
+            Why Choose <span className="text-primary animate-pulse-glow">Meth VTC</span>?
           </h3>
           <div className="grid md:grid-cols-3 gap-8">
             {[

@@ -21,7 +21,7 @@ const contactInfo = [
   {
     icon: Mail,
     title: 'Email',
-    value: 'auratmp7@gmail.com',
+    value: '',
     description: 'Send us an email for business inquiries',
     isLink: false,
   },
@@ -64,7 +64,7 @@ const roleMap: Record<string, string> = {
 
       // 2. Create the Discord Embed Payload
       const payload = {
-        username: "Aura VTC Contact Bot",
+        username: "Meth VTC Contact Bot",
         content: `New message for <@&${selectedRoleId}>`,
         embeds: [
           {
@@ -79,7 +79,7 @@ const roleMap: Record<string, string> = {
               { name: "📝 Message", value: formData.message },
             ],
             timestamp: new Date().toISOString(),
-            footer: { text: "Sent from Aura VTC Website" }
+            footer: { text: "Sent from Meth VTC Website" }
           }
         ]
       };

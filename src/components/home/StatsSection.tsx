@@ -92,7 +92,7 @@ const StatsSection = () => {
               <span className="text-primary glow-text animate-pulse-glow">Statistics</span>
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Aura VTC achievements
+              Meth VTC achievements
             </p>
           </div>
 

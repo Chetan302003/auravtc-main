@@ -185,7 +185,7 @@ const Hub = () => {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="font-display text-5xl md:text-8xl font-black tracking-tighter mb-6 leading-none"
             >
-              <span className="text-foreground">AURA VTC HUB </span>
+              <span className="text-foreground">METH VTC HUB </span>
             </motion.h1>
 
             <motion.p
@@ -203,7 +203,7 @@ const Hub = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center gap-6"
             >
-              <a href="https://aurahub-web.vercel.app/login" target="_blank" rel="noopener noreferrer">
+              <a href="https://methhub-web.vercel.app/login" target="_blank" rel="noopener noreferrer">
                 <Button size="xl" className="rounded-xl shadow-primary/20 shadow-lg group">
                   Login to Hub <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -374,7 +374,7 @@ const Hub = () => {
                   <h2 className="text-4xl md:text-5xl font-display font-black text-white mb-4">Ready to Hit the Road?</h2>
                   <p className="text-muted-foreground text-lg max-w-xl">Join the most advanced virtual trucking community today. Real-time logging, professional rank systems, and a community that never sleeps.</p>
                 </div>
-                <a href="https://aurahub-web.vercel.app/login" target="_blank" rel="noopener noreferrer">
+                <a href="https://methhub-web.vercel.app/login" target="_blank" rel="noopener noreferrer">
                   <Button size="xl" className="rounded-xl px-12 py-8 text-xl shadow-primary/30 shadow-2xl hover:scale-105 transition-transform group">
                     Get Started <Zap className="ml-2 w-6 h-6 fill-black group-hover:scale-125 transition-transform" />
                   </Button>

@@ -86,7 +86,7 @@ const AttendanceDownload = ({ isAdmin }: AttendanceDownloadProps) => {
       XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
 
       // Generate filename with date range
-      const filename = `AuraVTC_Attendance_${format(startDate, 'yyyyMMdd')}_to_${format(endDate, 'yyyyMMdd')}.xlsx`;
+      const filename = `MethVTC_Attendance_${format(startDate, 'yyyyMMdd')}_to_${format(endDate, 'yyyyMMdd')}.xlsx`;
 
       // Download file
       XLSX.writeFile(wb, filename);

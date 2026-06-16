@@ -62,7 +62,7 @@ const Preloader = () => {
             >
               <img
                 src={logo}
-                alt="Aura VTC"
+                alt="Meth VTC"
                 className="w-20 h-20 object-contain"
               />
             </motion.div>

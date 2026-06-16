@@ -49,13 +49,13 @@ const Navbar = () => {
             <div className="relative">
               <img
                 src={logo}
-                alt="Aura VTC"
+                alt="Meth VTC"
                 className="h-12 w-12 rounded-full transition-all duration-300 group-hover:scale-110"
               />
               <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <span className="font-display font-bold text-xl tracking-wider">
-              <span className="text-foreground">AURA</span>
+              <span className="text-foreground">METH</span>
               <span className="text-primary glow-text"> VTC</span>
             </span>
           </Link>

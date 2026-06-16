@@ -130,7 +130,7 @@ if (!res.ok) {
             </span>
             <h1 className="font-display text-5xl md:text-6xl font-bold">
               <span className="text-foreground">Join </span>
-              <span className="text-primary glow-text">Aura VTC</span>
+              <span className="text-primary glow-text">Meth VTC</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Fill out the application form below to become part of our family
@@ -141,7 +141,7 @@ if (!res.ok) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="outline">View Aura VTC on TruckersMP</Button>
+                <Button variant="outline">View Meth VTC on TruckersMP</Button>
               </a>
             </div>
             <div className="neon-line max-w-xs mx-auto" />
@@ -257,7 +257,7 @@ if (!res.ok) {
 
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      Why do you want to join Aura VTC?
+                      Why do you want to join Meth VTC?
                     </label>
                     <Textarea
                       placeholder="Share your motivation for joining our community..."

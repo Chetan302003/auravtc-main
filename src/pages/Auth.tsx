@@ -266,7 +266,7 @@ const Auth = () => {
                       type="email"
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
-                      placeholder="admin@auravtc.com"
+                      placeholder="admin@methvtc.com"
                       required
                       className="mt-1.5 bg-secondary/50 border-border/50 focus:border-primary focus:ring-primary/20 text-foreground placeholder:text-muted-foreground"
                     />
@@ -429,7 +429,7 @@ const Auth = () => {
             <div className="mt-6 pt-6 border-t border-border/30 text-center">
               <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
                 <Truck className="w-4 h-4 text-primary" />
-                <span>Aura VTC Admin Panel</span>
+                <span>Meth VTC Admin Panel</span>
               </div>
             </div>
           </div>

@@ -80,7 +80,7 @@ const WebhookSender = ({ event, slots }: WebhookSenderProps) => {
       ].join('\n'),
       color: 0x1f8b4c,
       footer: {
-        text: `The Event Team of Aura • ${new Date().toLocaleString('en-GB', {
+        text: `The Event Team of Meth • ${new Date().toLocaleString('en-GB', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',

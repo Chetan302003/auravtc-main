@@ -29,7 +29,7 @@ const HeroSection = () => {
             </div>
 
             <h1 className="font-display text-5xl md:text-7xl font-bold leading-tight">
-              <span className="text-foreground">AURA</span>
+              <span className="text-foreground">METH</span>
               <br />
               <span className="text-primary glow-text-strong">VTC</span>
             </h1>
@@ -88,7 +88,7 @@ const HeroSection = () => {
               
               {/* Logo */}
               <div className="relative">
-                <img src={logo} alt="Aura VTC Logo" className="w-64 h-64 md:w-80 md:h-80 rounded-full object-cover glow-border-strong animate-float" />
+                <img src={logo} alt="Meth VTC Logo" className="w-64 h-64 md:w-80 md:h-80 rounded-full object-cover glow-border-strong animate-float" />
                 <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary/20 to-transparent animate-pulse-glow" />
               </div>
             </div>

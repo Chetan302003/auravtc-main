@@ -10,7 +10,7 @@ interface Partner {
   website: string;
 }
 
-const AURA_VTC_ID = 75200;
+const METH_VTC_ID = 21222;
 
 const PartnersSection = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -29,11 +29,11 @@ const PartnersSection = () => {
         if (Array.isArray(partnersArray)) {
           const mappedPartners: Partner[] = partnersArray
             .map((p: any) => {
-              // Get the "other" VTC (not Aura)
-              const other = p?.sender?.id !== AURA_VTC_ID ? p?.sender : p?.receiver;
+              // Get the "other" VTC (not Meth)
+              const other = p?.sender?.id !== METH_VTC_ID ? p?.sender : p?.receiver;
               
-              // Filter out Aura and invalid entries
-              if (!other?.id || !other?.name || other.id === AURA_VTC_ID) return null;
+              // Filter out Meth and invalid entries
+              if (!other?.id || !other?.name || other.id === METH_VTC_ID) return null;
 
               return {
                 id: other.id,
